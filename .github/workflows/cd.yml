@@ -55,7 +55,7 @@ jobs:
         run: ssh target ln -sfn /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }} /var/www/unlockit/live/current
 
       - name: Migrate database
-        run: ssh target "cd /var/www/unlockit/live/current && prisma migrate deploy"
+        run: ssh target "cd /var/www/unlockit/live/current && npm i -D prisma dotenv && dotenvx run -f ../../.env -- prisma migrate deploy"
 
       - name: Restart server
         run: ssh target "cd /var/www/unlockit/live/current && pm2 restart unlockit --update-env"
