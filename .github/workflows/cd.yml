@@ -40,7 +40,7 @@ jobs:
         run: echo "DEPLOY_NAME=unlockit$(date +%s%3N)" >> "$GITHUB_ENV"
 
       - name: Create deployment
-        run: ssh target mkdir /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/{.output,prisma}
+        run: ssh target mkdir -p /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/{.output,prisma}
 
       - name: Upload prisma config
         run: scp -r prisma.config.ts target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/
