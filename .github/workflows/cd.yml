@@ -40,10 +40,16 @@ jobs:
         run: echo "DEPLOY_NAME=unlockit$(date +%s%3N)" >> "$GITHUB_ENV"
 
       - name: Create deployment
-        run: ssh target mkdir /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}
+        run: ssh target mkdir /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/{.output,prisma}
 
-      - name: Upload files
-        run: scp -r ./.output/* target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/
+      - name: Upload prisma config
+        run: scp -r prisma.config.ts target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/
+
+      - name: Upload prisma files
+        run: scp -r ./prisma/* target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/prisma/
+
+      - name: Upload build
+        run: scp -r ./.output/* target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/.output/
 
       - name: Update symlink
         run: ssh target ln -sfn /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }} /var/www/unlockit/live/current
