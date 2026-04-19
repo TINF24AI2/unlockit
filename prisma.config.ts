@@ -9,21 +9,21 @@ const port = process.env.DATABASE_PORT;
 const user = process.env.DATABASE_USER;
 const password = process.env.DATABASE_PASSWORD;
 
-if (!database) {
-  throw new Error('DATABASE_NAME is not set')
-}
-if (!host) {
-  throw new Error('DATABASE_HOST is not set')
-}
-if (!port) {
-  throw new Error('DATABASE_PORT is not set')
-}
-if (!user) {
-  throw new Error('DATABASE_USER is not set')
-}
-if (!password) {
-  throw new Error('DATABASE_PASSWORD is not set')
-}
+// if (!database) {
+//   throw new Error('DATABASE_NAME is not set')
+// }
+// if (!host) {
+//   throw new Error('DATABASE_HOST is not set')
+// }
+// if (!port) {
+//   throw new Error('DATABASE_PORT is not set')
+// }
+// if (!user) {
+//   throw new Error('DATABASE_USER is not set')
+// }
+// if (!password) {
+//   throw new Error('DATABASE_PASSWORD is not set')
+// }
 
 const url = `postgresql://${user}:${password}@${host}:${port}/${database}`
 
