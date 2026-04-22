@@ -2,11 +2,11 @@ import 'dotenv/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../../generated/prisma/client'
 
-const database = process.env.DATABASE_NAME;
-const host = process.env.DATABASE_HOST;
-const port = process.env.DATABASE_PORT;
-const user = process.env.DATABASE_USER;
-const password = process.env.DATABASE_PASSWORD;
+const database = process.env.DATABASE_NAME
+const host = process.env.DATABASE_HOST
+const port = process.env.DATABASE_PORT
+const user = process.env.DATABASE_USER
+const password = process.env.DATABASE_PASSWORD
 
 if (!database) {
   throw new Error('DATABASE_NAME is not set')
@@ -29,7 +29,7 @@ const adapter = new PrismaPg({
   host,
   port: parseInt(port, 10),
   user,
-  password,
+  password
 })
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
