@@ -6,4 +6,4 @@ if (-not (Test-Path $hookDir)) {
 }
 
 # Kopiert das pre-commit Skript in das .git/hooks Verzeichnis
-Copy-Item -Path "..\..\scripts\pre-commit.sh" -Destination ".\.git\hooks\pre-commit" -Force
+Copy-Item -Path "scripts\pre-commit.sh" -Destination ".\.git\hooks\pre-commit" -Force
