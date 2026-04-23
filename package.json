@@ -7,6 +7,9 @@
     "dev": "nuxt dev",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck"
   },
@@ -14,12 +17,18 @@
     "@iconify-json/lucide": "^1.2.101",
     "@iconify-json/simple-icons": "^1.2.77",
     "@nuxt/ui": "^4.6.1",
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "dotenv": "^17.4.2",
     "nuxt": "^4.4.2",
+    "pg": "^8.20.0",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
+    "@types/pg": "^8.20.0",
     "eslint": "^10.2.0",
+    "prisma": "^7.7.0",
     "typescript": "^6.0.2",
     "vue-tsc": "^3.2.6"
   },

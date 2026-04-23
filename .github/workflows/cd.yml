@@ -1,8 +1,64 @@
 name: deploy
+
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo test
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install SSH key of server
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEPLOYKEY }}
+          name: id_target
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          config: ${{ secrets.HOST_CONFIG }}
+          if_key_exists: fail
+
+      - name: Install node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: NODE=development npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Build
+        run: npx nuxt build
+
+      - name: Deploy Name
+        run: echo "DEPLOY_NAME=unlockit$(date +%s%3N)" >> "$GITHUB_ENV"
+
+      - name: Create deployment
+        run: ssh target mkdir -p /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/{.output,prisma}
+
+      - name: Upload prisma config
+        run: scp -r prisma.config.ts target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/
+
+      - name: Upload prisma files
+        run: scp -r ./prisma/* target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/prisma/
+
+      - name: Upload build
+        run: scp -r ./.output/* target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/.output/
+
+      - name: Update symlink
+        run: ssh target ln -sfn /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }} /var/www/unlockit/live/current
+
+      - name: Migrate database
+        run: ssh target "cd /var/www/unlockit/live/current && npm i -D prisma dotenv && dotenvx run -f ../../.env -- prisma migrate deploy"
+
+      - name: Restart server
+        run: ssh target "cd /var/www/unlockit/live/current && pm2 restart unlockit --update-env"
+
+      - name: Cleanup old deployments
+        run: ssh target "ls -dt /var/www/unlockit/deployments/unlockit* | tail -n +6 | xargs rm -rf"

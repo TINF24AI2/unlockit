@@ -1,0 +1,19 @@
+name: rollback deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key of server
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEPLOYKEY }}
+          name: id_target
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          config: ${{ secrets.HOST_CONFIG }}
+          if_key_exists: fail
+      - name: Rollback to previous deployment
+        run: ssh target "ls -dt /var/www/unlockit/deployments/unlockit* | sed -n '2p' | xargs -I {} ln -sfn {} /var/www/unlockit/current && cd /var/www/unlockit/current && pm2 restart unlockit --update-env"

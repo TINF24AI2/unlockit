@@ -1,0 +1,22 @@
+info:
+  name: Set Setting
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/settings"
+  body:
+    type: json
+    data: |-
+      {
+        "field": "test",
+        "value": "321"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,4 @@
+name: Server
+variables:
+  - name: host
+    value: https://se-ssp.tix4u.de
