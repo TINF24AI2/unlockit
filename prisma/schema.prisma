@@ -45,9 +45,10 @@ model Product {
   productName String
   description String?
   vendor      String?
-  createdById String
+  createdById Int
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  createdBy   User         @relation(fields: [createdById], references: [id])
   licenseKeys LicenseKey[]
 
   @@index([createdById])
@@ -65,10 +66,11 @@ model LicenseKey {
   requiresAdminApproval Boolean             @default(true)
   status                LicenseStatus       @default(ACTIVE)
   expiresAt             DateTime?
-  uploadedById          String
+  uploadedById          Int
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   product               Product             @relation(fields: [productId], references: [id])
+  uploadedBy            User                @relation(fields: [uploadedById], references: [id])
   assignments           LicenseAssignment[]
 
   @@index([productId])
@@ -79,16 +81,44 @@ model LicenseKey {
 model LicenseAssignment {
   id             String           @id
   licenseKeyId   String
-  userId         String
+  userId         Int
   status         AssignmentStatus @default(PENDING)
   requestedAt    DateTime         @default(now())
   processedAt    DateTime?
-  processedById  String?
+  processedById  Int?
   assignmentNote String?
   licenseKey     LicenseKey       @relation(fields: [licenseKeyId], references: [id])
+  processedBy    User?            @relation("LicenseAssignmentProcessedBy", fields: [processedById], references: [id])
+  user           User             @relation("LicenseAssignmentUser", fields: [userId], references: [id])
 
   @@index([licenseKeyId])
   @@index([userId])
   @@index([processedById])
   @@map("license_assignments")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String?
+  password    String
+  permissions Permission[] @default([])
+
+  createdBy   User?    @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdById Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdUsers                User[]              @relation("UserCreatedBy")
+  processedLicenseAssignments LicenseAssignment[] @relation("LicenseAssignmentProcessedBy")
+  licenseAssignments          LicenseAssignment[] @relation("LicenseAssignmentUser")
+  licenseKeys                 LicenseKey[]
+  products                    Product[]
+
+  @@index([createdById])
+  @@index([email])
+}
+
+enum Permission {
+  ADMIN
 }
