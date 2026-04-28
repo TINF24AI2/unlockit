@@ -50,6 +50,7 @@ model Product {
   updatedAt   DateTime     @updatedAt
   licenseKeys LicenseKey[]
 
+  @@index([createdById])
   @@map("products")
 }
 
@@ -59,7 +60,7 @@ model LicenseKey {
   licenseName           String
   licenseKey            String
   licenseType           LicenseType         @default(SINGLE)
-  maxUsages             Int?
+  maxUsages             Int                 @default(1)
   currentUsages         Int                 @default(0)
   requiresAdminApproval Boolean             @default(true)
   status                LicenseStatus       @default(ACTIVE)
@@ -71,6 +72,7 @@ model LicenseKey {
   assignments           LicenseAssignment[]
 
   @@index([productId])
+  @@index([uploadedById])
   @@map("license_keys")
 }
 
@@ -87,5 +89,6 @@ model LicenseAssignment {
 
   @@index([licenseKeyId])
   @@index([userId])
+  @@index([processedById])
   @@map("license_assignments")
 }

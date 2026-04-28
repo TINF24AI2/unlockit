@@ -27,7 +27,7 @@ CREATE TABLE "license_keys" (
     "licenseName" TEXT NOT NULL,
     "licenseKey" TEXT NOT NULL,
     "licenseType" "LicenseType" NOT NULL DEFAULT 'SINGLE',
-    "maxUsages" INTEGER,
+    "maxUsages" INTEGER NOT NULL DEFAULT 1,
     "currentUsages" INTEGER NOT NULL DEFAULT 0,
     "requiresAdminApproval" BOOLEAN NOT NULL DEFAULT true,
     "status" "LicenseStatus" NOT NULL DEFAULT 'ACTIVE',
@@ -54,13 +54,22 @@ CREATE TABLE "license_assignments" (
 );
 
 -- CreateIndex
+CREATE INDEX "products_createdById_idx" ON "products"("createdById");
+
+-- CreateIndex
 CREATE INDEX "license_keys_productId_idx" ON "license_keys"("productId");
+
+-- CreateIndex
+CREATE INDEX "license_keys_uploadedById_idx" ON "license_keys"("uploadedById");
 
 -- CreateIndex
 CREATE INDEX "license_assignments_licenseKeyId_idx" ON "license_assignments"("licenseKeyId");
 
 -- CreateIndex
 CREATE INDEX "license_assignments_userId_idx" ON "license_assignments"("userId");
+
+-- CreateIndex
+CREATE INDEX "license_assignments_processedById_idx" ON "license_assignments"("processedById");
 
 -- AddForeignKey
 ALTER TABLE "license_keys" ADD CONSTRAINT "license_keys_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
