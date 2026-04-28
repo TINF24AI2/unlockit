@@ -20,3 +20,72 @@ model Setting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+enum LicenseType {
+  SINGLE
+  VOLUME
+}
+
+enum LicenseStatus {
+  ACTIVE
+  EXHAUSTED
+  EXPIRED
+  INACTIVE
+}
+
+enum AssignmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REVOKED
+}
+
+model Product {
+  id          String       @id
+  productName String
+  description String?
+  vendor      String?
+  createdById String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  licenseKeys LicenseKey[]
+
+  @@map("products")
+}
+
+model LicenseKey {
+  id                    String              @id
+  productId             String
+  licenseName           String
+  licenseKey            String
+  licenseType           LicenseType         @default(SINGLE)
+  maxUsages             Int?
+  currentUsages         Int                 @default(0)
+  requiresAdminApproval Boolean             @default(true)
+  status                LicenseStatus       @default(ACTIVE)
+  expiresAt             DateTime?
+  uploadedById          String
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  product               Product             @relation(fields: [productId], references: [id])
+  assignments           LicenseAssignment[]
+
+  @@index([productId])
+  @@map("license_keys")
+}
+
+model LicenseAssignment {
+  id             String           @id
+  licenseKeyId   String
+  userId         String
+  status         AssignmentStatus @default(PENDING)
+  requestedAt    DateTime         @default(now())
+  processedAt    DateTime?
+  processedById  String?
+  assignmentNote String?
+  licenseKey     LicenseKey       @relation(fields: [licenseKeyId], references: [id])
+
+  @@index([licenseKeyId])
+  @@index([userId])
+  @@map("license_assignments")
+}
