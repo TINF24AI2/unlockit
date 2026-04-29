@@ -23,7 +23,8 @@
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "0.5.29",
     "pg": "^8.20.0",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
