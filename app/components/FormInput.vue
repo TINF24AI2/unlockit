@@ -1,9 +1,7 @@
 <script setup lang="ts">
-const props = defineProps({
-  id: {
-    type: String,
-    default: null
-  },
+import { useId } from 'vue'
+
+defineProps({
   modelValue: {
     type: [String, Number],
     default: ''
@@ -20,19 +18,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-let uniqueIdCounter = 0
-
-const inputId = computed(() => {
-  // use provided id when availabe
-  if (props.id) {
-    return props.id
-  }
-
-  // generate unique id based on label and counter
-  uniqueIdCounter++
-  const sanitizedLabel = props.label.toLowerCase().replace(/[^a-z0-9]/g, '-')
-  return `${sanitizedLabel}-${uniqueIdCounter}`
-})
+const inputId = useId()
 
 function onInput(event: Event) {
   emit('update:modelValue', (event.target as HTMLInputElement).value)
