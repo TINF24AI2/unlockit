@@ -4,6 +4,10 @@
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
 
+  --color-brand: #83AF99;
+  --color-brandgray: #CECBCB;
+  --color-brandred: #C46F71;
+
   --color-green-50: #EFFDF5;
   --color-green-100: #D9FBE8;
   --color-green-200: #B3F5D1;
@@ -15,4 +19,8 @@
   --color-green-800: #016538;
   --color-green-900: #0A5331;
   --color-green-950: #052E16;
+}
+
+body {
+  @apply bg-white text-gray-900;
 }
