@@ -30,7 +30,8 @@ const url = `postgresql://${user}:${password}@${host}:${port}/${database}`
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
-    path: 'prisma/migrations'
+    path: 'prisma/migrations',
+    seed: 'tsx prisma/seed.ts'
   },
   datasource: {
     url: url
