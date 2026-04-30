@@ -6,13 +6,13 @@
     </h1>
 
     <!-- Menüoptionen -->
-    <div class="flex gap-6 items-start">
-      <Container class="flex flex-col justify-between gap-4 w-1/4 flex-shrink-0 h-fit p-6 !bg-[var(--color-brand)]">
+    <div class="grid grid-cols-[1fr_3fr] gap-20 items-start">
+      <Container class="grid gap-4 w-full h-fit p-6 !bg-[var(--color-brand)]">
         <UButton
           color="neutral"
           class="justify-center"
         >
-          Produkte/Lizenzen <br> hinzufügen und verwalten
+          Produkte/Lizenzen hinzufügen und verwalten
         </UButton>
 
         <UButton
@@ -33,14 +33,14 @@
           color="neutral"
           class="justify-center"
         >
-          Accountpasswort <br> ändern
+          Accountpasswort ändern
         </UButton>
       </Container>
 
       <!-- Historie -->
-      <Container class="flex-1 p-6">
+      <Container class="p-6">
         <!-- Titel -->
-        <div class="flex flex-col mb-6 gap-2">
+        <div class="grid mb-6 gap-2">
           <span class="text-center">
             Historie genehmigter Beantragungen
           </span>
@@ -48,7 +48,7 @@
             v-model="search"
             type="text"
             placeholder="Suchen..."
-            class="self-end bg-white rounded-md pl-3 pr-3 py-1"
+            class="justify-self-end w-1/3 bg-white rounded-md pl-3 pr-3 py-1"
           >
         </div>
         <div class="bg-white rounded-3xl p-4">
