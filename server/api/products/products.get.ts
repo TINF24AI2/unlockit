@@ -27,7 +27,6 @@ export default defineEventHandler(async (event) => {
 
   if (isAdmin) {
     products = await prisma.product.findMany({
-      where: { createdById: userId },
       include: { licenseKeys: true },
       orderBy: { createdAt: 'desc' }
     })

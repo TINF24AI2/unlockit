@@ -77,20 +77,13 @@ export default defineEventHandler(async (event: H3Event) => {
 
   const product = await prisma.product.findUnique({
     where: { id: productId },
-    select: { id: true, createdById: true }
+    select: { id: true }
   })
 
   if (!product) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Product not found'
-    })
-  }
-
-  if (product.createdById !== uploadedById) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'You cannot create license keys for products you did not create'
     })
   }
 
