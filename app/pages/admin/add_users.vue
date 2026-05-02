@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue' // für automatisches generieren eines Passworts beim Laden der Seite
+import { ref, onMounted } from 'vue' // for automatically generating a password on page load
 
 const username = ref('')
 const email = ref('')
 const password = ref('')
 const admin = ref(false)
 
-// generiertes Passwort für den ersten Login
+// generating the password
 function generatePassword(length = 12) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&'
   let out = ''
@@ -17,7 +17,7 @@ function generatePassword(length = 12) {
 }
 
 function generateNewPassword() {
-  password.value = generatePassword(12)
+  password.value = generatePassword()
 }
 
 onMounted(() => {
@@ -35,7 +35,7 @@ const goHomepage = () => {
 }
 
 const goBack = () => {
-  // Placeholder für vorherige Seite
+  // Placeholder for previous page
 }
 </script>
 
