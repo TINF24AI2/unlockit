@@ -1,11 +1,11 @@
 <template>
   <div class="p-6">
-    <!-- Seitentitel -->
+    <!-- Title -->
     <h1 class="text-center mb-6 text-2xl">
       Herzlich Willkommen Admin
     </h1>
 
-    <!-- Menüoptionen -->
+    <!-- Options menu -->
     <div class="grid grid-cols-[1fr_3fr] gap-20 items-start">
       <Container class="grid gap-4 w-full h-fit p-6 !bg-[var(--color-brand)]">
         <UButton
@@ -37,9 +37,9 @@
         </UButton>
       </Container>
 
-      <!-- Historie -->
+      <!-- History -->
       <Container class="p-6">
-        <!-- Titel -->
+        <!-- Title -->
         <div class="grid mb-6 gap-2">
           <span class="text-center">
             Historie genehmigter Beantragungen
@@ -52,7 +52,7 @@
           >
         </div>
         <div class="bg-white rounded-3xl p-4">
-          <!-- Mock-Up Datenausgabe -->
+          <!-- Mock-Up Data Output -->
           <div
             v-for="item in filteredData"
             :key="item.id"
@@ -71,7 +71,7 @@ import { ref, computed } from 'vue'
 import Container from '@/components/Container.vue'
 
 const search = ref('')
-// Mock-Daten für die Beantragungen
+// Mock-Up Data for the history
 const mockData = [
   { id: 1, product: 'Microsoft Word 2017', user: 'Mia Müller', date: '26.04.2026', status: 'genehmigt' },
   { id: 2, product: 'Microsoft Word 2017', user: 'Max Münzner', date: '17.03.2026', status: 'abgelehnt' },
@@ -79,7 +79,7 @@ const mockData = [
   { id: 4, product: 'Microsoft Excel 2019', user: 'Max Münzner', date: '19.01.2026', status: 'abgelehnt' }
 ]
 
-// Filtert die Daten basierend auf der Suchanfrage
+// filter data based on search input
 const filteredData = computed(() => {
   if (!search.value) return mockData
 

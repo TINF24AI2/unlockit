@@ -13,6 +13,14 @@ defineProps({
   type: {
     type: String,
     default: 'text'
+  },
+  readonly: {
+    type: Boolean,
+    default: false
+  },
+  required: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -31,6 +39,8 @@ function onInput(event: Event) {
       :id="inputId"
       :type="type"
       :value="modelValue"
+      :readonly="readonly"
+      :required="required"
       class="w-full px-6 pt-4 pb-2 rounded-full bg-white border-none focus:outline-none focus:ring-2 focus:ring-brand peer placeholder-transparent"
       :placeholder="label"
       @input="onInput"
