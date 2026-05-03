@@ -1,0 +1,22 @@
+info:
+  name: Update User permissions
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{host}}/api/users/user-permissions"
+  body:
+    type : json
+    data: |-
+      {
+        "id": 3,
+        "permissions": ["ADMIN"]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
