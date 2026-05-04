@@ -1,0 +1,35 @@
+info:
+  name: Create Product
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{host}}/api/products/products"
+  body:
+    type: json
+    data: |-
+      {
+        "productName": "My Product",
+        "description": "Short description",
+        "vendor": "Vendor Inc."
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+        if (body?.data?.id) {
+        bru.setVar('productId', body.data.id);
+        bru.setEnvVar('productId', body.data.id);
+        bru.setGlobalEnvVar('productId', body.data.id);
+        console.log('All vars set:', body.data.id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,38 @@
+info:
+  name: Create License Key
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/license-keys/license-keys"
+  body:
+    type: json
+    data: |-
+      {
+        "productId": "{{productId}}",
+        "licenseName": "Standard License",
+        "licenseKey": "ABC-123-DEF",
+        "licenseType": "SINGLE",
+        "maxUsages": 1,
+        "requiresAdminApproval": true,
+        "expiresAt": null
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: pre-request
+      code: |-
+        const productId = bru.getEnvVar('productId');
+        if (!productId) {
+          console.warn('WARNING: productId is not set. Did you run "Create Product" first?');
+        } else {
+          console.log('Using productId:', productId);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
