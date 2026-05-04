@@ -1,13 +1,13 @@
 info:
   name: Update User permissions
   type: http
-  seq: 2
+  seq: 6
 
 http:
   method: PATCH
   url: "{{host}}/api/users/user-permissions"
   body:
-    type : json
+    type: json
     data: |-
       {
         "id": 3,
