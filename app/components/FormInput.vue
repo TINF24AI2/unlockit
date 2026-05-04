@@ -38,6 +38,7 @@ function onInput(event: Event) {
     <input
       :id="inputId"
       :type="type"
+      v-bind="$attrs"
       :value="modelValue"
       :readonly="readonly"
       :required="required"
