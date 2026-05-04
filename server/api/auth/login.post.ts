@@ -1,17 +1,11 @@
 import { z } from 'zod'
-import { prisma } from '../../utils/prisma'
+import { prisma } from '#server/utils/prisma'
+import { badCred } from '#server/utils/auth'
 
 const bodySchema = z.object({
   email: z.string(),
   password: z.string()
 })
-
-function badCred() {
-  throw createError({
-    statusCode: 401,
-    message: 'Bad credentials'
-  })
-}
 
 export default defineEventHandler(async (event) => {
   const { email, password } = await readValidatedBody(event, bodySchema.parse)
@@ -37,6 +31,14 @@ export default defineEventHandler(async (event) => {
   const user = users[0]!
 
   if (await verifyPassword(user.password, password)) {
+    if (user.needsPasswordReset) {
+      return {
+        success: false,
+        errorCode: 'PASSWORD_RESET_REQUIRED',
+        message: 'Password reset required'
+      }
+    }
+
     if (passwordNeedsReHash(user.password)) {
       const newHash = await hashPassword(password)
       await prisma.user.update({

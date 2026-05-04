@@ -1,6 +1,7 @@
 import { createError, defineEventHandler, readBody, type H3Event } from 'h3'
 import { Permission } from '../../../generated/prisma/client'
-import { prisma } from '../../utils/prisma'
+import { prisma } from '#server/utils/prisma'
+import { requireGoodPassword } from '#server/utils/auth'
 
 interface UserPayload {
   email: string
@@ -60,14 +61,7 @@ export default defineEventHandler(async (event: H3Event) => {
   }
 
   // Check password complexity (length and character requirements from frontend)
-  if (password.length < 12) {
-    throw createError({ statusCode: 400, statusMessage: 'Password must be at least 12 characters' })
-  }
-
-  const passwordRegex = /^[A-Za-z0-9!#$%&]+$/
-  if (!passwordRegex.test(password)) {
-    throw createError({ statusCode: 400, statusMessage: 'Password contains invalid characters' })
-  }
+  requireGoodPassword(password)
 
   // Hash the password before storing it in the database
   const hashedPassword = await hashPassword(password)
