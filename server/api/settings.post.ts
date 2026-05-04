@@ -9,6 +9,8 @@ interface SettingPayload {
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody<SettingPayload>(event)
 
+  await authorize(event, isAdmin)
+
   const field = body.field?.trim()
   const value = body.value?.trim()
 

@@ -45,12 +45,14 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    const sessionUser: LoggedInUser = {
+      id: user.id,
+      name: user.name || '',
+      permissions: user.permissions
+    }
+
     await setUserSession(event, {
-      user: {
-        id: user.id,
-        name: user.name,
-        permissions: user.permissions
-      }
+      user: sessionUser
     })
     return {
       success: true,
