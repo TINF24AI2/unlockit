@@ -40,7 +40,8 @@ async function main() {
       email: 'system',
       name: 'System',
       password: 'system',
-      permissions: ['ADMIN']
+      permissions: ['ADMIN'],
+      needsPasswordReset: false
     }
   })
 
@@ -50,6 +51,7 @@ async function main() {
       name: 'Admin',
       password: '$scrypt$n=16384,r=8,p=1$NxeN6Yey0RhcUGHIRYg0Wg$BTerWnJ5irPHV5mPLiLMd5Kiqf7RNtk8nA1LvpafsD69kvhW8L9HRmwww+BGWUYXksB8CglO8PXW7UE2dLw4wQ',
       permissions: ['ADMIN'],
+      needsPasswordReset: false,
       createdById: system.id
     }
   })
