@@ -246,11 +246,11 @@ const goBack = () => {
           </DangerButton>
         </div>
       </form>
-      <div class="fixed bottom-6 right-6">
-        <StandardButton @click="goHomepage">
-          Zurück zur Startseite
-        </StandardButton>
-      </div>
+    </div>
+    <div class="flex justify-end mt-6">
+      <StandardButton @click="goHomepage">
+        Zurück zur Startseite
+      </StandardButton>
     </div>
   </Container>
 </template>
