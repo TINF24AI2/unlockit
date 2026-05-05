@@ -1,3 +1,72 @@
+<script setup>
+import { ref, computed } from 'vue'
+
+// Navigation
+const goCreateUser = () => {
+  navigateTo('/admin/add_users')
+}
+
+const search = ref('')
+
+// API call
+const { data: usersResponse, refresh } = await useFetch('/api/users/users', {
+  method: 'GET'
+})
+
+// normalising the user data
+const users = computed(() =>
+  (usersResponse.value?.data || []).map(user => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    admin: user.permissions.includes('ADMIN')
+  }))
+)
+
+// filter for name and email and sort
+const filteredUsers = computed(() => {
+  const query = search.value.toLowerCase()
+
+  return users.value
+    .filter((user) => {
+      const name = (user.name || '').toLowerCase()
+      const email = user.email.toLowerCase()
+      return name.includes(query) || email.includes(query)
+    })
+    // sort by name
+    .sort((lUser, rUser) =>
+      (lUser.name || lUser.email).localeCompare(rUser.name || rUser.email)
+    )
+})
+
+// Admin toggle
+const toggleAdmin = async (id) => {
+  const selectedUser = users.value.find(user => user.id === id)
+  if (!selectedUser) return
+  // if user is admin => remove admin permissions otherwise add them
+  const nextPermissions = selectedUser.admin ? [] : ['ADMIN']
+
+  try {
+    await $fetch('/api/users/user-permissions', {
+      method: 'PATCH',
+      body: {
+        id,
+        permissions: nextPermissions
+      }
+    })
+
+    await refresh()
+  } catch {
+    alert('Berechtigung kann nicht geändert werden.')
+  }
+}
+
+const deleteUser = () => {
+  alert('Löschen ist aktuell noch nicht implementiert.') // TODO
+  // Placeholder
+}
+</script>
+
 <template>
   <Container class="p-6 relative pb-20">
     <!-- Header -->
@@ -55,66 +124,3 @@
     </div>
   </Container>
 </template>
-
-<script setup>
-import { ref, computed } from 'vue'
-
-// Navigation
-const goCreateUser = () => {
-  navigateTo('/admin/add_users')
-}
-
-const search = ref('')
-
-// API call
-const { data: usersResponse, refresh } = await useFetch('/api/users/users')
-
-// normalising the user data
-const users = computed(() =>
-  (usersResponse.value?.data || []).map(user => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    admin: user.permissions.includes('ADMIN')
-  }))
-)
-
-// filter for name and email and sort
-const filteredUsers = computed(() => {
-  const query = search.value.toLowerCase()
-
-  return users.value
-    .filter((user) => {
-      const name = (user.name || '').toLowerCase()
-      const email = user.email.toLowerCase()
-      return name.includes(query) || email.includes(query)
-    })
-    // sort by name
-    .sort((lUser, rUser) =>
-      (lUser.name || lUser.email).localeCompare(rUser.name || rUser.email)
-    )
-})
-
-// Admin toggle
-const toggleAdmin = async (id) => {
-  const selectedUser = users.value.find(user => user.id === id)
-  if (!selectedUser) return
-  // if user is admin => remove admin permissions otherwise add them
-  const nextPermissions = selectedUser.admin ? [] : ['ADMIN']
-
-  await $fetch('/api/users/user-permissions', {
-    method: 'PATCH',
-    body: {
-      id,
-      permissions: nextPermissions
-    }
-  })
-
-  await refresh()
-}
-
-const deleteUser = () => {
-  alert('Löschen ist aktuell noch nicht implementiert.') // TODO
-  // Placeholder
-}
-</script>

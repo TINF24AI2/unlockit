@@ -1,3 +1,35 @@
+<script setup>
+import { ref, computed } from 'vue'
+import Container from '@/components/Container.vue'
+
+const goManageUsers = () => {
+  navigateTo('/admin/manage_users')
+}
+
+const search = ref('')
+// Mock-Up Data for the history
+const mockData = [
+  { id: 1, product: 'Microsoft Word 2017', user: 'Mia Müller', date: '26.04.2026', status: 'genehmigt' },
+  { id: 2, product: 'Microsoft Word 2017', user: 'Max Münzner', date: '17.03.2026', status: 'abgelehnt' },
+  { id: 3, product: 'Microsoft Word 2020', user: 'Mia Müller', date: '02.02.2026', status: 'in Bearbeitung' },
+  { id: 4, product: 'Microsoft Excel 2019', user: 'Max Münzner', date: '19.01.2026', status: 'abgelehnt' }
+]
+
+// filter data based on search input
+const filteredData = computed(() => {
+  if (!search.value) return mockData
+
+  const s = search.value.toLowerCase()
+
+  return mockData.filter(item =>
+    item.product.toLowerCase().includes(s)
+    || item.user.toLowerCase().includes(s)
+    || item.status.toLowerCase().includes(s)
+    || item.date.toLowerCase().includes(s)
+  )
+})
+</script>
+
 <template>
   <div class="p-6">
     <!-- Title -->
@@ -66,35 +98,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed } from 'vue'
-import Container from '@/components/Container.vue'
-
-const goManageUsers = () => {
-  navigateTo('/admin/manage_users')
-}
-
-const search = ref('')
-// Mock-Up Data for the history
-const mockData = [
-  { id: 1, product: 'Microsoft Word 2017', user: 'Mia Müller', date: '26.04.2026', status: 'genehmigt' },
-  { id: 2, product: 'Microsoft Word 2017', user: 'Max Münzner', date: '17.03.2026', status: 'abgelehnt' },
-  { id: 3, product: 'Microsoft Word 2020', user: 'Mia Müller', date: '02.02.2026', status: 'in Bearbeitung' },
-  { id: 4, product: 'Microsoft Excel 2019', user: 'Max Münzner', date: '19.01.2026', status: 'abgelehnt' }
-]
-
-// filter data based on search input
-const filteredData = computed(() => {
-  if (!search.value) return mockData
-
-  const s = search.value.toLowerCase()
-
-  return mockData.filter(item =>
-    item.product.toLowerCase().includes(s)
-    || item.user.toLowerCase().includes(s)
-    || item.status.toLowerCase().includes(s)
-    || item.date.toLowerCase().includes(s)
-  )
-})
-</script>
