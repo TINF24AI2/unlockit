@@ -169,7 +169,7 @@ const goBack = () => {
       </div>
     </form>
 
-    <div class="absolute bottom-6 right-6">
+    <div class="flex justify-end mt-6">
       <StandardButton @click="goHomepage">
         Zurück zur Startseite
       </StandardButton>
