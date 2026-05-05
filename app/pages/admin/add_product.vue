@@ -9,17 +9,14 @@ const singleLicenceCodes = ref<string[]>([])
 
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
-const existingProducts = ref<{ id: string, productName: string }[]>([])
-const selectedProductId = ref<string | null>(null)
-
-onMounted(async () => {
-  try {
-    const response = await $fetch('/api/products/products', { method: 'GET' })
-    existingProducts.value = response.data
-  } catch (error) {
-    console.error('Fehler beim Laden der Produkte:', error)
+const { data: existingProducts } = await useFetch('/api/products/products', {
+  method: 'GET',
+  default: () => [],
+  transform: (response: { data: { id: string, productName: string }[] }) => {
+    return response.data
   }
 })
+const selectedProductId = ref<string | null>(null)
 
 watch(numberOfVolumeLicences, (newCount) => {
   const count = newCount || 0
