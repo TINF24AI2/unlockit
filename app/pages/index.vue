@@ -1,3 +1,16 @@
+<script setup lang="ts">
+definePageMeta({
+  middleware: ['authenticated']
+})
+
+const { clear: clearSession } = useUserSession()
+
+async function logout() {
+  await clearSession()
+  await navigateTo('/login')
+}
+</script>
+
 <template>
   <div>
     <UPageHero
@@ -72,5 +85,8 @@
         }]"
       />
     </UPageSection>
+    <button @click="logout">
+      Logout
+    </button>
   </div>
 </template>
