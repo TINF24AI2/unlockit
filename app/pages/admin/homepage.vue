@@ -25,6 +25,7 @@
         <UButton
           color="neutral"
           class="justify-center"
+          @click="goManageUsers"
         >
           Verwaltung User
         </UButton>
@@ -69,6 +70,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import Container from '@/components/Container.vue'
+
+const goManageUsers = () => {
+  navigateTo('/admin/manage_users')
+}
 
 const search = ref('')
 // Mock-Up Data for the history
