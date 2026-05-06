@@ -9,7 +9,7 @@ export const noSelfElevation = defineAbility((user: LoggedInUser, targetUserId: 
     return false
   }
   if (user.id === targetUserId) {
-    return deny('Admins cannot elevate themselfes', 403)
+    return deny('Admins cannot elevate themselves', 403)
   }
   return true
 })

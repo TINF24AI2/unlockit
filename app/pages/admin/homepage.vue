@@ -70,6 +70,10 @@
 import { ref, computed } from 'vue'
 import Container from '@/components/Container.vue'
 
+definePageMeta({
+  middleware: ['is-admin']
+})
+
 const search = ref('')
 // Mock-Up Data for the history
 const mockData = [
