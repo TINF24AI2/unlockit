@@ -8,24 +8,7 @@ interface PermissionPayload {
 }
 
 export default defineEventHandler(async (event: H3Event) => {
-  const session = await requireUserSession(event)
-  const sessionUser = session as { user?: { id?: number, permissions?: string[] } }
-
-  if (!sessionUser.user?.permissions?.includes('ADMIN')) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Only admins can update user permissions'
-    })
-  }
-
-  const adminId = Number(sessionUser.user.id)
-
-  if (!Number.isInteger(adminId)) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Session user is missing'
-    })
-  }
+  await authorize(event, isAdmin)
 
   // Get user ID from body
   const body = await readBody<PermissionPayload>(event)
@@ -39,12 +22,7 @@ export default defineEventHandler(async (event: H3Event) => {
   }
 
   // Prevent admins from modifying their own permissions
-  if (targetId === adminId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Admins cannot modify their own permissions'
-    })
-  }
+  authorize(event, noSelfElevation, targetId)
 
   // Validate permissions array
   if (!body.permissions || !Array.isArray(body.permissions)) {
