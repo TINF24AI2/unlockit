@@ -2,8 +2,13 @@
 import { ref, computed } from 'vue'
 import Container from '@/components/Container.vue'
 
+// Navigation
 const goManageUsers = () => {
   navigateTo('/admin/manage_users')
+}
+
+const goManageProducts = () => { // TODO change to the manage_products site which still isn't implemented
+  navigateTo('/admin/add_product')
 }
 
 const search = ref('')
@@ -43,8 +48,9 @@ const filteredData = computed(() => {
         <UButton
           color="neutral"
           class="justify-center"
+          @click="goManageProducts"
         >
-          Produkte/Lizenzen hinzufügen und verwalten
+          Verwaltung von Produkte/Lizenzen
         </UButton>
 
         <UButton
