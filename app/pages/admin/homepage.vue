@@ -2,6 +2,10 @@
 import { ref, computed } from 'vue'
 import Container from '@/components/Container.vue'
 
+definePageMeta({
+  middleware: ['is-admin']
+})
+
 // Navigation
 const goManageUsers = () => {
   navigateTo('/admin/manage_users')

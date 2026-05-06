@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ['is-admin']
+})
+
 const productname = ref('')
 const licencename = ref('')
 const numberOfVolumeLicences = ref(0)

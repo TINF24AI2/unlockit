@@ -9,24 +9,12 @@ interface ProductPayload {
 }
 
 export default defineEventHandler(async (event: H3Event) => {
+  await authorize(event, isAdmin)
+
   const session = await requireUserSession(event)
-  const sessionUser = session as { user?: { id?: number, permissions?: string[] } }
+  const sessionUser = session.user as LoggedInUser
 
-  if (!sessionUser.user?.permissions?.includes('ADMIN')) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Only admins can create products'
-    })
-  }
-
-  const createdById = Number(sessionUser.user.id)
-
-  if (!Number.isInteger(createdById)) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Session user is missing'
-    })
-  }
+  const createdById = Number(sessionUser.id)
 
   const body = await readBody<ProductPayload>(event)
 

@@ -1,31 +1,14 @@
-import { createError, defineEventHandler } from 'h3'
+import { defineEventHandler } from 'h3'
 import { prisma } from '../../utils/prisma'
 
-type SessionUser = {
-  user?: {
-    id?: number
-    permissions?: Array<string>
-  }
-}
-
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
-  const sessionUser = session as SessionUser
+  await authorize(event, isUser)
 
-  const userId = Number(sessionUser.user?.id)
-
-  if (!Number.isInteger(userId)) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Session user is missing'
-    })
-  }
-
-  const isAdmin = sessionUser.user?.permissions?.includes('ADMIN') ?? false
+  const isAdmininistrator = await allows(event, isAdmin)
 
   let products
 
-  if (isAdmin) {
+  if (isAdmininistrator) {
     products = await prisma.product.findMany({
       include: { licenseKeys: true },
       orderBy: { createdAt: 'desc' }

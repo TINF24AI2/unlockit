@@ -13,32 +13,13 @@ interface LicenseKeyPayload {
   expiresAt?: string | null
 }
 
-type SessionUser = {
-  user?: {
-    id?: number
-    permissions?: Array<string>
-  }
-}
-
 export default defineEventHandler(async (event: H3Event) => {
+  await authorize(event, isAdmin)
+
   const session = await requireUserSession(event)
-  const sessionUser = session as SessionUser
+  const sessionUser = session.user as LoggedInUser
 
-  if (!sessionUser.user?.permissions?.includes('ADMIN')) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Only admins can create license keys'
-    })
-  }
-
-  const uploadedById = Number(sessionUser.user.id)
-
-  if (!Number.isInteger(uploadedById)) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Session user is missing'
-    })
-  }
+  const uploadedById = Number(sessionUser.id)
 
   const body = await readBody<LicenseKeyPayload>(event)
 

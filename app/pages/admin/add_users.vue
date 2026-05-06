@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue' // for automatically generating a password on page load
 
+definePageMeta({
+  middleware: ['is-admin']
+})
+
 const username = ref('')
 const email = ref('')
 const password = ref('')
