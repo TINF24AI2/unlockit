@@ -248,9 +248,12 @@ const goBack = () => {
       </form>
     </div>
     <div class="flex justify-end mt-6">
-      <StandardButton @click="goHomepage">
+      <UButton
+        color="neutral"
+        @click="goHomepage"
+      >
         Zurück zur Startseite
-      </StandardButton>
+      </UButton>
     </div>
   </Container>
 </template>

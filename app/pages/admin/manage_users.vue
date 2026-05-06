@@ -65,6 +65,11 @@ const deleteUser = () => {
   alert('Löschen ist aktuell noch nicht implementiert.') // TODO
   // Placeholder
 }
+
+// navigations
+const goHomepage = () => {
+  navigateTo('/admin/homepage')
+}
 </script>
 
 <template>
@@ -117,10 +122,16 @@ const deleteUser = () => {
       </div>
     </div>
 
-    <div class="absolute bottom-6 right-6">
+    <div class="absolute bottom-6 right-6 flex gap-3">
       <StandardButton @click="goCreateUser">
         User hinzufügen
       </StandardButton>
+      <UButton
+        color="neutral"
+        @click="goHomepage"
+      >
+        Zurück zur Startseite
+      </UButton>
     </div>
   </Container>
 </template>
