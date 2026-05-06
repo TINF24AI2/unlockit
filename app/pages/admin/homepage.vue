@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import Container from '@/components/Container.vue'
-  
+
 definePageMeta({
   middleware: ['is-admin']
 })
