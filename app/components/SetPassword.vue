@@ -20,17 +20,31 @@ const fields = ref<AuthFormField[]>([
     type: 'password',
     label: 'Neues Passwort',
     required: true
+  },
+  {
+    name: 'confirmPassword',
+    type: 'password',
+    label: 'Neues Passwort bestätigen',
+    required: true
   }
 ])
 
 const schema = z.object({
   // change to z.email('Ungültige Email-Adresse') later
-  email: z.string().min(1, 'Nutzername ist erforderlich'),
-  oldPassword: z.string().min(1, 'Altes Passwort ist erforderlich'),
+  email: z.string('Nutzername ist erforderlich').min(1, 'Nutzername ist erforderlich'),
+
+  oldPassword: z.string('Altes Passwort ist erforderlich').min(1, 'Altes Passwort ist erforderlich'),
+
   newPassword: z.string('Passwort ist erforderlich')
     .min(12, 'Passwort muss mindestens 12 Zeichen lang sein')
-    .regex(/^[A-Za-z0-9!#$%&]+$/, 'Schwaches Passwort')
+    .regex(/^[A-Za-z0-9!#$%&]+$/, 'Schwaches Passwort'),
+
+  confirmPassword: z.string('Passwort wiederholen').min(1, 'Passwort wiederholen')
 })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: 'Passwörter stimmen nicht überein',
+    path: ['confirmPassword']
+  })
 
 type Schema = z.output<typeof schema>
 
