@@ -5,6 +5,11 @@ export default defineEventHandler(async (event: H3Event) => {
   await authorize(event, isAdmin)
 
   const users = await prisma.user.findMany({
+    where: {
+      email: {
+        contains: '@'
+      }
+    },
     select: {
       id: true,
       email: true,
