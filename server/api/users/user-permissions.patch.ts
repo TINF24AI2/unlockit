@@ -22,7 +22,7 @@ export default defineEventHandler(async (event: H3Event) => {
   }
 
   // Prevent admins from modifying their own permissions
-  authorize(event, noSelfElevation, targetId)
+  await authorize(event, noSelfElevation, targetId)
 
   // Validate permissions array
   if (!body.permissions || !Array.isArray(body.permissions)) {
