@@ -98,11 +98,12 @@ model LicenseAssignment {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  name        String?
-  password    String
-  permissions Permission[] @default([])
+  id                 Int          @id @default(autoincrement())
+  email              String       @unique
+  name               String?
+  password           String
+  needsPasswordReset Boolean      @default(true)
+  permissions        Permission[] @default([])
 
   createdBy   User?    @relation("UserCreatedBy", fields: [createdById], references: [id])
   createdById Int?
