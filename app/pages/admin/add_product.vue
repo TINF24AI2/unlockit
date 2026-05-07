@@ -1,125 +1,151 @@
 <script setup lang="ts">
+import { ref, reactive, watch, computed } from 'vue'
+import * as z from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
+
 definePageMeta({
   middleware: ['is-admin']
 })
 
-const productname = ref('')
-const licencename = ref('')
-const numberOfVolumeLicences = ref(0)
-const numberOfSingleLicences = ref(0)
+const schema = z.object({
+  selectedProductId: z.string().nullable(),
+  productName: z.string().optional(),
+  licenseName: z.string().min(1, 'Lizenzname ist erforderlich'),
+  numberOfVolumeLicences: z.number().min(0),
+  numberOfSingleLicences: z.number().min(0),
+  volumeLicenceCodes: z.array(z.object({
+    code: z.string().min(1, 'Lizenzcode ist erforderlich'),
+    maxUsage: z.number().min(1, 'Max. Nutzung muss mindestens 1 sein')
+  })),
+  singleLicenceCodes: z.array(z.object({
+    code: z.string().min(1, 'Lizenzcode ist erforderlich')
+  }))
+})
 
-const volumeLicenceCodes = ref<{ code: string, maxUsage: number }[]>([])
-const singleLicenceCodes = ref<string[]>([])
+type Schema = z.output<typeof schema>
 
+const state = reactive({
+  selectedProductId: null as string | null,
+  productName: '',
+  licenseName: '',
+  numberOfVolumeLicences: 0,
+  numberOfSingleLicences: 0,
+  volumeLicenceCodes: [] as { code: string, maxUsage: number }[],
+  singleLicenceCodes: [] as { code: string }[]
+})
+
+const isSubmitting = ref(false)
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
-const { data: existingProducts } = await useFetch('/api/products/products', {
+const { data: existingProducts, refresh: refreshProducts } = await useFetch('/api/products/products', {
   method: 'GET',
   default: () => [],
   transform: (response: { data: { id: string, productName: string }[] }) => {
-    return response.data
+    return response.data.map(p => ({ label: p.productName, value: p.id }))
   }
 })
-const selectedProductId = ref<string | null>(null)
 
-watch(numberOfVolumeLicences, (newCount) => {
+const productOptions = computed(() => [
+  { label: '-- Neues Produkt erstellen --', value: null },
+  ...(existingProducts.value || [])
+])
+
+watch(() => state.numberOfVolumeLicences, (newCount) => {
   const count = newCount || 0
-  const difference = count - volumeLicenceCodes.value.length
-
+  const difference = count - state.volumeLicenceCodes.length
   if (difference > 0) {
     for (let i = 0; i < difference; i++) {
-      volumeLicenceCodes.value.push({ code: '', maxUsage: 1 })
+      state.volumeLicenceCodes.push({ code: '', maxUsage: 1 })
     }
   } else if (difference < 0) {
-    volumeLicenceCodes.value.splice(count)
+    state.volumeLicenceCodes.splice(count)
   }
 })
 
-watch(numberOfSingleLicences, (newCount) => {
+watch(() => state.numberOfSingleLicences, (newCount) => {
   const count = newCount || 0
-  const difference = count - singleLicenceCodes.value.length
-
+  const difference = count - state.singleLicenceCodes.length
   if (difference > 0) {
     for (let i = 0; i < difference; i++) {
-      singleLicenceCodes.value.push('')
+      state.singleLicenceCodes.push({ code: '' })
     }
   } else if (difference < 0) {
-    singleLicenceCodes.value.splice(count)
+    state.singleLicenceCodes.splice(count)
   }
 })
 
-const submit = async () => {
+// Formular zurücksetzen
+const resetForm = () => {
+  state.selectedProductId = null
+  state.productName = ''
+  state.licenseName = ''
+  state.numberOfVolumeLicences = 0
+  state.numberOfSingleLicences = 0
+  state.volumeLicenceCodes = []
+  state.singleLicenceCodes = []
+}
+
+const submit = async (event: FormSubmitEvent<Schema>) => {
+  if (isSubmitting.value) return
+  isSubmitting.value = true
   notification.value = null
 
   try {
-    let productId: string | null = selectedProductId.value
+    let productId = state.selectedProductId
+    const data = event.data
 
-    if (productId === null) {
+    if (!productId && data.productName) {
       const productResponse = await $fetch('/api/products/products', {
         method: 'POST',
-        body: {
-          productName: productname.value
-        }
+        body: { productName: data.productName }
       })
       productId = productResponse.data.id
+      await refreshProducts()
     }
 
-    for (const volumeLicence of volumeLicenceCodes.value) {
-      if (volumeLicence.code) {
-        await $fetch('/api/license-keys/license-keys', {
-          method: 'POST',
-          body: {
-            productId,
-            licenseName: licencename.value,
-            licenseKey: volumeLicence.code,
-            licenseType: 'VOLUME',
-            maxUsages: volumeLicence.maxUsage
-          }
-        })
-      }
+    if (!productId) {
+      throw new Error('Kein Produkt ausgewählt oder erstellt.')
     }
 
-    for (const singleLicenceCode of singleLicenceCodes.value) {
-      if (singleLicenceCode) {
-        await $fetch('/api/license-keys/license-keys', {
-          method: 'POST',
-          body: {
-            productId,
-            licenseName: licencename.value,
-            licenseKey: singleLicenceCode,
-            licenseType: 'SINGLE',
-            maxUsages: 1
-          }
-        })
-      }
-    }
+    const licensePromises = [
+      ...data.volumeLicenceCodes.map(licence => $fetch('/api/license-keys/license-keys', {
+        method: 'POST',
+        body: {
+          productId,
+          licenseName: data.licenseName,
+          licenseKey: licence.code,
+          licenseType: 'VOLUME',
+          maxUsages: licence.maxUsage
+        }
+      })),
+      ...data.singleLicenceCodes.map(licence => $fetch('/api/license-keys/license-keys', {
+        method: 'POST',
+        body: {
+          productId,
+          licenseName: data.licenseName,
+          licenseKey: licence.code,
+          licenseType: 'SINGLE',
+          maxUsages: 1
+        }
+      }))
+    ]
+    await Promise.all(licensePromises)
 
-    notification.value = {
-      message: 'Produkt und/oder Lizenzen erfolgreich hinzugefügt!',
-      type: 'success'
-    }
-
-    productname.value = ''
-    licencename.value = ''
-    numberOfVolumeLicences.value = 0
-    numberOfSingleLicences.value = 0
-    volumeLicenceCodes.value = []
-    singleLicenceCodes.value = []
+    notification.value = { message: 'Produkt und/oder Lizenzen erfolgreich hinzugefügt!', type: 'success' }
+    resetForm()
   } catch (error) {
     console.error('Fehler beim Hinzufügen:', error)
-    notification.value = {
-      message: 'Fehler beim Hinzufügen des Produkts oder der Lizenzen.',
-      type: 'failure'
-    }
+    notification.value = { message: 'Fehler beim Hinzufügen des Produkts oder der Lizenzen.', type: 'failure' }
+  } finally {
+    isSubmitting.value = false
   }
 }
 
 const goHomepage = () => {
   navigateTo('/admin/homepage')
 }
-
 const goBack = () => {
-  // Placeholder for previous page
+  navigateTo('/admin/homepage')
 }
 </script>
 
@@ -129,131 +155,158 @@ const goBack = () => {
       Produkt/Lizenzen hinzufügen
     </h2>
 
-    <div class="w-full max-w-4xl mx-auto">
-      <form
-        class="flex flex-col space-y-4"
-        @submit.prevent="submit"
-      >
-        <NotificationContainer
-          v-if="notification"
-          :message="notification.message"
-          :type="notification.type"
-          @close="notification = null"
-        />
-        <div class="relative">
-          <select
-            id="product-select"
-            v-model="selectedProductId"
-            class="w-full px-6 pt-4 pb-2 rounded-full bg-white border-none focus:outline-none focus:ring-2 focus:ring-brand peer placeholder-transparent"
-            placeholder="Produkt auswählen"
-          >
-            <option :value="null">
-              -- Neues Produkt erstellen --
-            </option>
-            <option
-              v-for="product in existingProducts"
-              :key="product.id"
-              :value="product.id"
-            >
-              {{ product.productName }}
-            </option>
-          </select>
-          <label
-            for="product-select"
-            class="absolute left-6 top-4 text-gray-500 transition-all
-                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-base
-                            peer-focus:top-0 peer-focus:text-sm peer-focus:text-brand peer-focus:font-bold
-                            peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-sm peer-[:not(:placeholder-shown)]:text-brand peer-[:not(:placeholder-shown)]:font-bold"
-          >
-            Produkt auswählen
-          </label>
-        </div>
-        <FormInput
-          v-if="selectedProductId === null"
-          v-model="productname"
-          type="text"
-          label="Produktname"
-          required
-        />
-        <FormInput
-          v-model="licencename"
-          type="text"
-          label="Lizenzname"
-          required
-        />
-        <FormInput
-          v-model.number="numberOfVolumeLicences"
-          type="number"
-          label="Anzahl Volumenlizenzen"
-          min="0"
-          required
-        />
+    <NotificationContainer
+      v-if="notification"
+      class="mb-4"
+      :message="notification.message"
+      :type="notification.type"
+      @close="notification = null"
+    />
 
+    <UForm
+      :schema="schema"
+      :state="state"
+      class="grid gap-y-4"
+      @submit="submit"
+    >
+      <UFormField
+        label="Produkt auswählen"
+        name="selectedProductId"
+      >
+        <USelect
+          v-model="state.selectedProductId"
+          :items="productOptions"
+          value-attribute="value"
+          option-attribute="label"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField
+        v-if="state.selectedProductId === null"
+        label="Neuer Produktname"
+        name="productName"
+        required
+      >
+        <UInput
+          v-model="state.productName"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField
+        label="Lizenzname"
+        name="licenseName"
+        required
+      >
+        <UInput
+          v-model="state.licenseName"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField
+        label="Anzahl Volumenlizenzen"
+        name="numberOfVolumeLicences"
+      >
+        <UInput
+          v-model.number="state.numberOfVolumeLicences"
+          type="number"
+          class="w-full"
+          min="0"
+        />
+      </UFormField>
+
+      <div
+        v-if="state.volumeLicenceCodes.length > 0"
+        class="grid gap-y-4 pl-8"
+      >
         <div
-          v-if="volumeLicenceCodes.length > 0"
-          class="flex flex-col space-y-4 pl-8"
+          v-for="(licence, index) in state.volumeLicenceCodes"
+          :key="`vol-${index}`"
+          class="flex items-start gap-x-4"
         >
-          <div
-            v-for="(licence, index) in volumeLicenceCodes"
-            :key="`vol-${index}`"
-            class="flex items-end space-x-4"
+          <UFormField
+            :label="`Volumenlizenzcode ${index + 1}`"
+            :name="`volumeLicenceCodes.${index}.code`"
+            class="flex-grow"
+            required
           >
-            <FormInput
+            <UInput
               v-model="licence.code"
-              type="text"
-              :label="`Volumenlizenzcode ${index + 1}`"
-              class="flex-grow"
-              required
+              class="w-full"
             />
-            <FormInput
+          </UFormField>
+          <UFormField
+            label="Max. Nutzung"
+            :name="`volumeLicenceCodes.${index}.maxUsage`"
+            class="w-48"
+            required
+          >
+            <UInput
               v-model.number="licence.maxUsage"
               type="number"
-              label="Max. Nutzung"
+              class="w-full"
               min="1"
-              class="w-48"
-              required
             />
-          </div>
+          </UFormField>
         </div>
+      </div>
 
-        <FormInput
-          v-model.number="numberOfSingleLicences"
+      <UFormField
+        label="Anzahl Einzellizenzen"
+        name="numberOfSingleLicences"
+      >
+        <UInput
+          v-model.number="state.numberOfSingleLicences"
           type="number"
-          label="Anzahl Einzellizenzen"
+          class="w-full"
           min="0"
-          required
         />
+      </UFormField>
 
-        <div
-          v-if="singleLicenceCodes.length > 0"
-          class="flex flex-col space-y-4 pl-8"
+      <div
+        v-if="state.singleLicenceCodes.length > 0"
+        class="grid gap-y-4 pl-8"
+      >
+        <UFormField
+          v-for="(licence, index) in state.singleLicenceCodes"
+          :key="`single-${index}`"
+          :label="`Einzellizenzcode ${index + 1}`"
+          :name="`singleLicenceCodes.${index}.code`"
+          required
         >
-          <FormInput
-            v-for="(code, index) in singleLicenceCodes"
-            :key="`single-${index}`"
-            v-model="singleLicenceCodes[index]"
-            type="text"
-            :label="`Einzellizenzcode ${index + 1}`"
-            required
+          <UInput
+            v-model="licence.code"
+            class="w-full"
           />
-        </div>
+        </UFormField>
+      </div>
 
-        <div class="flex space-x-4 pt-4">
-          <SubmitButton class="flex-1">
-            Hinzufügen
-          </SubmitButton>
-          <DangerButton
-            class="flex-1"
-            @click="goBack"
-          >
-            Abbrechen
-          </DangerButton>
-        </div>
-      </form>
-    </div>
+      <div class="grid grid-cols-2 gap-4 pt-4">
+        <UButton
+          type="submit"
+          color="success"
+          block
+          :loading="isSubmitting"
+          :label="isSubmitting ? 'Wird hinzugefügt...' : 'Hinzufügen'"
+        />
+        <UButton
+          type="button"
+          color="error"
+          variant="solid"
+          block
+          @click="goBack"
+        >
+          Abbrechen
+        </UButton>
+      </div>
+    </UForm>
+
     <div class="flex justify-end mt-6">
       <UButton
-        color="neutral"
+        type="button"
+        variant="ghost"
         @click="goHomepage"
       >
         Zurück zur Startseite

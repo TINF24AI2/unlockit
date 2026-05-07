@@ -1,14 +1,27 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue' // for automatically generating a password on page load
+import * as z from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
 
 definePageMeta({
   middleware: ['is-admin']
 })
 
-const username = ref('')
-const email = ref('')
-const password = ref('')
-const admin = ref(false)
+const schema = z.object({
+  email: z.email('Ungültige E-Mail Adresse'),
+  username: z.string().min(1, { message: 'Benutzername ist erforderlich' }),
+  password: z.string().min(12, { message: 'Passwort muss mindestens 12 Zeichen lang sein' }),
+  admin: z.boolean()
+})
+type Schema = z.output<typeof schema>
+
+const state = ref({
+  email: '',
+  username: '',
+  password: '',
+  admin: false
+})
+
 const isSubmitting = ref(false)
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
@@ -23,7 +36,7 @@ function generatePassword(length = 12) {
 }
 
 function generateNewPassword() {
-  password.value = generatePassword()
+  state.value.password = generatePassword()
 }
 
 onMounted(() => {
@@ -31,17 +44,8 @@ onMounted(() => {
 })
 
 // submit
-const submit = async () => {
+const submit = async (event: FormSubmitEvent<Schema>) => {
   if (isSubmitting.value) return
-
-  // validation
-  if (!email.value || !password.value) {
-    notification.value = {
-      message: 'Bitte alle Pflichtfelder ausfüllen',
-      type: 'failure'
-    }
-    return
-  }
 
   isSubmitting.value = true
   notification.value = null
@@ -49,23 +53,21 @@ const submit = async () => {
   try {
     await $fetch('/api/users/users', {
       method: 'POST',
-      body: {
-        email: email.value,
-        username: username.value,
-        password: password.value,
-        admin: admin.value
-      }
+      body: event.data
     })
 
     notification.value = {
-      message: `Der User für die E-Mail ${email.value} wurde erfolgreich hinzugefügt.`,
+      message: `Der User für die E-Mail ${event.data.email} wurde erfolgreich hinzugefügt.`,
       type: 'success'
     }
 
     // Reset form
-    email.value = ''
-    username.value = ''
-    admin.value = false
+    state.value = {
+      email: '',
+      username: '',
+      password: '',
+      admin: false
+    }
     generateNewPassword()
   } catch (error: unknown) {
     let message = 'User konnte nicht erstellt werden.'
@@ -110,72 +112,86 @@ const goBack = () => {
       :type="notification.type"
       @close="notification = null"
     />
-    <form
+    <UForm
+      :schema="schema"
+      :state="state"
       class="grid gap-y-4"
-      @submit.prevent="submit"
+      @submit="submit"
     >
-      <FormInput
-        v-model="email"
-        type="email"
+      <UFormField
         label="E-Mail Adresse"
+        name="email"
         required
-      />
-      <FormInput
-        v-model="username"
-        type="text"
+      >
+        <UInput
+          v-model="state.email"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField
         label="Benutzername"
+        name="username"
         required
-      />
-      <div class="flex items-center gap-2">
-        <div class="flex-1">
-          <FormInput
-            v-model="password"
-            type="text"
-            label="Generiertes Passwort"
+      >
+        <UInput
+          v-model="state.username"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField
+        label="Generiertes Passwort"
+        name="password"
+      >
+        <div class="flex items-center gap-2">
+          <UInput
+            v-model="state.password"
+            class="flex-1"
             readonly
           />
+          <UButton
+            color="neutral"
+            @click.prevent="generateNewPassword"
+          >
+            Neu
+          </UButton>
         </div>
-        <UButton
-          color="neutral"
-          @click.prevent="generateNewPassword"
-        >
-          Neu
-        </UButton>
-      </div>
-      <div>
-        <input
-          id="admin"
-          v-model="admin"
-          type="checkbox"
-          class="w-4 h-4 text-brand rounded focus:ring-brand focus:ring-2"
-        >
-        <label
-          for="admin"
-          class="text-sm font-medium text-gray-900"
-        >
-          Administratorrechte
-        </label>
-      </div>
+      </UFormField>
+
+      <UFormField name="admin">
+        <UCheckbox
+          v-model="state.admin"
+          name="admin"
+          label="Administratorrechte"
+        />
+      </UFormField>
 
       <div class="grid grid-cols-2 gap-4 pt-4">
-        <SubmitButton
-          class="w-full"
-          :disabled="isSubmitting"
-        >
-          {{ isSubmitting ? 'Wird erstellt...' : 'Hinzufügen' }}
-        </SubmitButton>
-        <DangerButton
-          class="w-full"
+        <UButton
+          type="submit"
+          color="success"
+          block
+          :loading="isSubmitting"
+          :label="isSubmitting ? 'Wird erstellt....' : 'Hinzufügen'"
+        />
+
+        <UButton
+          type="button"
+          color="error"
+          variant="solid"
+          block
           @click="goBack"
         >
           Abbrechen
-        </DangerButton>
+        </UButton>
       </div>
-    </form>
+    </UForm>
 
     <div class="flex justify-end mt-6">
       <UButton
-        color="neutral"
+        type="button"
+        variant="ghost"
         @click="goHomepage"
       >
         Zurück zur Startseite
