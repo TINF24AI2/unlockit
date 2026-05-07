@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-// Navigation
-const goCreateUser = () => {
-  navigateTo('/admin/add_users')
-}
+definePageMeta({
+  middleware: ['is-admin']
+})
 
 const search = ref('')
 
@@ -66,7 +65,10 @@ const deleteUser = () => {
   // Placeholder
 }
 
-// navigations
+// Navigation
+const goCreateUser = () => {
+  navigateTo('/admin/add_users')
+}
 const goHomepage = () => {
   navigateTo('/admin/homepage')
 }
@@ -111,23 +113,44 @@ const goHomepage = () => {
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-          <StandardButton @click="toggleAdmin(item.id)">
+          <UButton
+            type="button"
+            color="primary"
+            variant="solid"
+            block
+            @click="toggleAdmin(item.id)"
+          >
             {{ item.admin ? 'Zum User machen' : 'Zum Admin machen' }}
-          </StandardButton>
+          </UButton>
 
-          <DangerButton @click="deleteUser(item.id)">
+          <UButton
+            type="button"
+            color="error"
+            variant="solid"
+            block
+            @click="deleteUser(item.id)"
+          >
             Löschen
-          </DangerButton>
+          </UButton>
         </div>
       </div>
     </div>
 
-    <div class="absolute bottom-6 right-6 flex gap-3">
-      <StandardButton @click="goCreateUser">
-        User hinzufügen
-      </StandardButton>
+    <div class="absolute bottom-6 right-6">
       <UButton
-        color="neutral"
+        type="button"
+        color="success"
+        variant="solid"
+        block
+        @click="goCreateUser"
+      >
+        User hinzufügen
+      </UButton>
+    </div>
+    <div class="flex justify-end mt-6">
+      <UButton
+        type="button"
+        variant="ghost"
         @click="goHomepage"
       >
         Zurück zur Startseite
