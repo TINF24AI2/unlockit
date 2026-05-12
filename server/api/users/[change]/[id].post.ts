@@ -1,5 +1,3 @@
-// TODO: restructure api.endpoint see assignments folder for example
-
 import { createError, defineEventHandler, readBody, getRouterParam, type H3Event } from 'h3'
 import { Permission } from '../../../../generated/prisma/client'
 import { prisma } from '../../../utils/prisma'
