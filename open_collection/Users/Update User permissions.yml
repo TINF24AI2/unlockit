@@ -4,13 +4,19 @@ info:
   seq: 6
 
 http:
-  method: PATCH
-  url: "{{host}}/api/users/user-permissions"
+  method: POST
+  url: "{{host}}/api/users/:change/:id"
+  params:
+    - name: change
+      value: permissions
+      type: path
+    - name: id
+      value: 3
+      type: path
   body:
     type: json
     data: |-
       {
-        "id": 3,
         "permissions": ["ADMIN"]
       }
   auth: inherit
