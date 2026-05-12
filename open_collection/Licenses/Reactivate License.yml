@@ -1,0 +1,33 @@
+info:
+  name: Reactivate License
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{host}}/api/license-keys/:change/:id"
+  params:
+    - name: change
+      value: reactivate
+      type: path
+    - name: id
+      value: "{{licenseId}}"
+      type: path
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: pre-request
+      code: |-
+        const licenseId = bru.getEnvVar('licenseId');
+        if (!licenseId) {
+          console.warn('WARNING: licenseId is not set. Did you run "Create License Key" first?');
+        } else {
+          console.log('Using licenseId:', licenseId);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
