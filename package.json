@@ -20,9 +20,11 @@
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.8.0",
     "dotenv": "^17.4.2",
+    "nodemailer": "^7.0.13",
     "nuxt": "^4.4.2",
     "nuxt-auth-utils": "0.5.29",
     "nuxt-authorization": "0.3.5",
+    "nuxt-nodemailer": "^1.1.4",
     "pg": "^8.20.0",
     "tailwindcss": "^4.2.2",
     "zod": "^4.3.6"
