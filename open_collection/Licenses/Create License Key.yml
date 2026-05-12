@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: "{{host}}/api/license-keys/license-keys"
+  url: "{{host}}/api/license-keys"
   body:
     type: json
     data: |-
@@ -29,6 +29,15 @@ runtime:
           console.warn('WARNING: productId is not set. Did you run "Create Product" first?');
         } else {
           console.log('Using productId:', productId);
+        }
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+        if (body?.data?.id) {
+        bru.setVar('licenseId', body.data.id);
+        bru.setEnvVar('licenseId', body.data.id);
+        bru.setGlobalEnvVar('licenseId', body.data.id);
+        console.log('All vars set:', body.data.id);
         }
 
 settings:
