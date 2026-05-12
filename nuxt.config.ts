@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     'nuxt-auth-utils',
-    'nuxt-authorization'
+    'nuxt-authorization',
+    'nuxt-nodemailer'
   ],
 
   devtools: {
@@ -25,6 +26,17 @@ export default defineNuxtConfig({
         commaDangle: 'never',
         braceStyle: '1tbs'
       }
+    }
+  },
+
+  nodemailer: {
+    from: '"SE-SSP" <se-ssp@tix4u.de>',
+    host: '127.0.0.1',
+    port: 1025,
+    secure: false,
+    auth: {
+      user: '',
+      pass: ''
     }
   }
 })

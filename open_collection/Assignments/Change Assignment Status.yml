@@ -1,0 +1,22 @@
+info:
+  name: Change Assignment Status
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{host}}/api/assignments/:change/:id"
+  params:
+    - name: id
+      value: 1ecb8657-9d6e-4212-9836-73d189cd821a
+      type: path
+    - name: change
+      value: approve
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

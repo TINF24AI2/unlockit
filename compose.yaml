@@ -9,5 +9,10 @@ services:
       - "${DATABASE_PORT}:5432"
     volumes:
       - db_data:/var/lib/postgresql
+  mailcatcher:
+    image: dockage/mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
 volumes:
   db_data:
