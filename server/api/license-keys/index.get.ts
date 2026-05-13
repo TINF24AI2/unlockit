@@ -1,32 +1,47 @@
 import { defineEventHandler, getQuery, type H3Event } from 'h3'
 import { LicenseStatus } from '../../../generated/prisma/client'
-import { listLicenses } from '../../services/licenses'
+import { listLicenses, getLicensesWithUserContext } from '../../services/licenses'
 
 export default defineEventHandler(async (event: H3Event) => {
-  await authorize(event, isAdmin)
+  await authorize(event, isUser)
 
-  // Extract optional query parameters for filtering (relies on licenses service)
+  const session = await requireUserSession(event)
+  const sessionUser = session.user as LoggedInUser
+  const userId = Number(sessionUser.id)
+
+  const isAdministrator = await allows(event, isAdmin)
+
+  // Extract query parameters
   const query = getQuery(event)
-  const productId = query.productId as string | undefined
-  const statusQuery = query.status as string | undefined
-  const status = statusQuery && Object.values(LicenseStatus).includes(statusQuery as LicenseStatus)
-    ? statusQuery as LicenseStatus
-    : undefined
-  const onlyActive = query.onlyActive === 'true' || query.onlyActive === true
+  const view = (query.view as string | undefined)?.toLowerCase()
 
-  // Fetch licenses with optional filters
-  const licenses = await listLicenses({
-    productId,
-    status,
-    onlyActive
-  })
+  // Admin view: show all licenses with optional filters
+  if (isAdministrator && view !== 'user') {
+    const productId = query.productId as string | undefined
+    const statusQuery = query.status as string | undefined
+    const status = statusQuery && Object.values(LicenseStatus).includes(statusQuery as LicenseStatus)
+      ? statusQuery as LicenseStatus
+      : undefined
+    const onlyActive = query.onlyActive === 'true' || query.onlyActive === true
 
-  // Return the list of licenses along with metadata
+    // Fetch licenses with optional filters
+    const licenses = await listLicenses({
+      productId,
+      status,
+      onlyActive
+    })
+
+    // Return the list of licenses along with metadata
+    return {
+      success: true,
+      data: licenses
+    }
+  }
+
+  // User view: show only active licenses with user context
+  const availableLicenses = await getLicensesWithUserContext(userId)
   return {
     success: true,
-    data: licenses,
-    meta: {
-      total: licenses.length
-    }
+    data: availableLicenses
   }
 })
