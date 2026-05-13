@@ -1,18 +1,15 @@
-import { createError, defineEventHandler, readBody, type H3Event } from 'h3'
-import { Permission } from '../../../generated/prisma/client'
-import { prisma } from '../../utils/prisma'
+import { createError, defineEventHandler, readBody, getRouterParam, type H3Event } from 'h3'
+import { Permission } from '../../../../generated/prisma/client'
+import { prisma } from '../../../utils/prisma'
 
 interface PermissionPayload {
-  id: number
   permissions: Permission[]
 }
 
 export default defineEventHandler(async (event: H3Event) => {
   await authorize(event, isAdmin)
 
-  // Get user ID from body
-  const body = await readBody<PermissionPayload>(event)
-  const targetId = Number(body.id)
+  const targetId = Number(getRouterParam(event, 'id'))
 
   if (!Number.isInteger(targetId) || targetId <= 0) {
     throw createError({
@@ -24,6 +21,7 @@ export default defineEventHandler(async (event: H3Event) => {
   // Prevent admins from modifying their own permissions
   await authorize(event, noSelfElevation, targetId)
 
+  const body = await readBody<PermissionPayload>(event)
   // Validate permissions array
   if (!body.permissions || !Array.isArray(body.permissions)) {
     throw createError({
