@@ -25,6 +25,7 @@ const search = ref('')
 const statusFilter = ref<LicenseStatus | null>(null)
 const productFilter = ref<string | null>(null)
 const onlyActiveFilter = ref(false)
+const deactivationReasons = ref<Record<string, string>>({})
 
 const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string }[] }>('/api/products')
 
@@ -83,13 +84,20 @@ const goAddProduct = () => {
   navigateTo('/admin/add_product')
 }
 
-const disableLicence = async (licenceId: string, reason: string) => {
+const disableLicence = async (licenceId: string) => {
+  const reason = deactivationReasons.value[licenceId]
+  if (!reason || !reason.trim()) {
+    alert('Bitte geben Sie einen Grund an.')
+    return
+  }
+
   try {
     await $fetch(`/api/license-keys/deactivate/${licenceId}`, {
       method: 'POST',
       body: { reason }
     })
     await refreshLicenses()
+    deactivationReasons.value[licenceId] = ''
   } catch (error) {
     alert(`Fehler beim Deaktivieren der Lizenz ${error}`)
   }
@@ -174,16 +182,40 @@ const reactivateLicence = async (licenceId: string) => {
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-          <UButton
+          <UPopover
             v-if="item.status === 'ACTIVE'"
-            type="button"
-            color="error"
-            variant="solid"
-            block
-            @click="disableLicence(item.id, 'Test')"
+            :key="`popover-${item.id}`"
+            :popper="{ placement: 'top-end' }"
           >
-            Deaktivieren
-          </UButton>
+            <UButton
+              color="error"
+              variant="solid"
+              block
+            >
+              Deaktivieren
+            </UButton>
+
+            <template #content>
+              <div class="p-4 w-64">
+                <p class="text-sm mb-2">
+                  Grund für die Deaktivierung:
+                </p>
+                <UTextarea
+                  v-model="deactivationReasons[item.id]"
+                  class="w-full"
+                />
+                <UButton
+                  class="mt-2"
+                  size="xs"
+                  color="error"
+                  block
+                  @click="disableLicence(item.id)"
+                >
+                  Bestätigen
+                </UButton>
+              </div>
+            </template>
+          </UPopover>
           <UButton
             v-else-if="item.status === 'INACTIVE'"
             type="button"
