@@ -147,12 +147,12 @@ const reactivateLicence = async (licenceId: string) => {
           v-model="onlyActiveFilter"
           label="Nur aktive"
         />
-        <input
+        <UInput
           v-model="search"
           type="text"
           placeholder="Suchen..."
-          class="justify-self-end w-1/3 bg-white rounded-md pl-3 pr-3 py-1"
-        >
+          class="justify-self-end w-1/3 rounded-md pl-3 pr-3 py-1"
+        />
       </div>
     </div>
 
@@ -186,6 +186,7 @@ const reactivateLicence = async (licenceId: string) => {
             v-if="item.status === 'ACTIVE'"
             :key="`popover-${item.id}`"
             :popper="{ placement: 'top-end' }"
+            :ui="{ content: 'border border-brand' }"
           >
             <UButton
               color="error"

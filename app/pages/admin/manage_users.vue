@@ -85,12 +85,12 @@ const goHomepage = () => {
         User-Verwaltung
       </h2>
 
-      <input
+      <UInput
         v-model="search"
         type="text"
         placeholder="Suchen..."
-        class="justify-self-end w-1/3 bg-white rounded-md pl-3 pr-3 py-1"
-      >
+        class="justify-self-end w-1/3 rounded-md pl-3 pr-3 py-1"
+      />
     </div>
 
     <!-- Scrollbar -->
