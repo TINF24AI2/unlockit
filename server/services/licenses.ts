@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { prisma } from '#server/utils/prisma'
 import { AssignmentStatus, LicenseStatus, type LicenseType, type Prisma } from '../../generated/prisma/client'
 
@@ -351,4 +352,78 @@ export async function getLicensesWithUserContext(
       canRequest
     }
   })
+}
+
+// RequestLicenseResult - structure returned when creating a license request
+export interface RequestLicenseResult {
+  id: string
+  licenseKeyId: string
+  userId: number
+  status: AssignmentStatus
+  requestedAt: Date
+  licenseKey: {
+    productId: string
+  }
+}
+
+// requestLicense - creates a new license request for a user
+// Selects the first available license for the product and creates a PENDING assignment
+export async function requestLicense(
+  userId: number,
+  productId: string,
+  reason: string
+): Promise<RequestLicenseResult> {
+  // Find first available active license for this product with available slots and not expired
+  const availableLicense = await prisma.licenseKey.findFirst({
+    where: {
+      productId,
+      status: LicenseStatus.ACTIVE,
+      OR: [
+        { expiresAt: null },
+        { expiresAt: { gt: new Date() } }
+      ]
+    },
+    select: {
+      id: true,
+      productId: true,
+      maxUsages: true,
+      currentUsages: true,
+      expiresAt: true
+    }
+  })
+
+  // Check if license has available slots
+  if (availableLicense && availableLicense.currentUsages >= availableLicense.maxUsages) {
+    throw new Error(`All licenses for product with ID ${productId} have reached their usage limit`)
+  }
+
+  if (!availableLicense) {
+    throw new Error(`No available licenses found for product with ID ${productId}`)
+  }
+
+  // Create a new assignment with PENDING status
+  const assignmentId = randomUUID()
+  const assignment = await prisma.licenseAssignment.create({
+    data: {
+      id: assignmentId,
+      licenseKeyId: availableLicense.id,
+      userId,
+      status: AssignmentStatus.PENDING,
+      assignmentNote: reason
+    },
+    select: {
+      id: true,
+      licenseKeyId: true,
+      userId: true,
+      status: true,
+      requestedAt: true,
+      licenseKey: {
+        select: {
+          productId: true
+        }
+      }
+    }
+  })
+
+  return assignment
 }
