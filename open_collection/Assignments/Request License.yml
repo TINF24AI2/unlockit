@@ -1,0 +1,22 @@
+info:
+  name: Request License
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/assignments"
+  body:
+    type: json
+    data: |-
+      {
+        "productId": "3f156600-26d3-4690-8d57-2113a7f91925",
+        "reason": "Ich benötige dieses Tool für meine aktuelle Projektarbeit"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
