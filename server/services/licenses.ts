@@ -255,3 +255,100 @@ export async function reactivateLicense(
     }
   }
 }
+
+// UserLicenseListing - structure of a license as returned for users viewing available licenses
+export interface UserLicenseListing {
+  id: string
+  licenseName: string
+  licenseType: LicenseType
+  maxUsages: number
+  currentUsages: number
+  availableSlots: number
+  requiresAdminApproval: boolean
+  expiresAt: Date | null
+  status: LicenseStatus
+  product: {
+    id: string
+    productName: string
+    description: string | null
+  }
+  userAssignment: {
+    status: AssignmentStatus | null
+    myApprovedCount: number
+  }
+  canRequest: boolean
+}
+
+// getLicensesWithUserContext - retrieves active licenses with user context
+export async function getLicensesWithUserContext(
+  userId: number
+): Promise<UserLicenseListing[]> {
+  type LicenseKeyWithAssignments = Prisma.LicenseKeyGetPayload<{
+    include: {
+      product: {
+        select: {
+          id: true
+          productName: true
+          description: true
+        }
+      }
+      assignments: {
+        select: {
+          status: true
+        }
+      }
+    }
+  }>
+
+  // Fetch all active licenses
+  const licenseKeys = await prisma.licenseKey.findMany({
+    where: {
+      status: LicenseStatus.ACTIVE
+    },
+    include: {
+      product: {
+        select: {
+          id: true,
+          productName: true,
+          description: true
+        }
+      },
+      assignments: {
+        where: { userId: userId },
+        select: {
+          status: true
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  }) as LicenseKeyWithAssignments[]
+
+  // Map to user context
+  return licenseKeys.map((license) => {
+    const userAssignments = license.assignments
+    const approvedCount = userAssignments.filter(a => a.status === AssignmentStatus.APPROVED).length
+    const hasPendingRequest = userAssignments.some(a => a.status === AssignmentStatus.PENDING)
+    const hasApprovedAssignment = approvedCount > 0
+
+    // User can request if: no approved assignment exists AND no pending request exists AND slots available
+    const canRequest = !hasApprovedAssignment && !hasPendingRequest && license.currentUsages < license.maxUsages
+
+    return {
+      id: license.id,
+      licenseName: license.licenseName,
+      licenseType: license.licenseType,
+      maxUsages: license.maxUsages,
+      currentUsages: license.currentUsages,
+      availableSlots: license.maxUsages - license.currentUsages,
+      requiresAdminApproval: license.requiresAdminApproval,
+      expiresAt: license.expiresAt,
+      status: license.status,
+      product: license.product,
+      userAssignment: {
+        status: userAssignments.length > 0 ? userAssignments[0]?.status ?? null : null,
+        myApprovedCount: approvedCount
+      },
+      canRequest
+    }
+  })
+}
