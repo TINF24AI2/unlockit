@@ -64,29 +64,17 @@ const statusOptions = computed(() => [
   ...Object.values(LicenseStatusValues).map(status => ({ label: statusLabels[status], value: status }))
 ])
 
-const licenses = computed(() =>
-  (licenceResponse.value?.data || []).map(license => ({
-    id: license.id,
-    name: license.licenseName,
-    key: license.licenseKey,
-    productName: license.product.productName,
-    status: license.status,
-    type: license.licenseType,
-    currentUsages: license.currentUsages,
-    maxUsages: license.maxUsages
-  }))
-)
-
 // searchbar
 const filteredLicenses = computed(() => {
+  const licenses = licenceResponse.value?.data || []
   const query = search.value.toLowerCase()
   if (!query) {
-    return licenses.value
+    return licenses
   }
-  return licenses.value.filter((license) => {
-    const name = (license.name || '').toLowerCase()
-    const productName = (license.productName || '').toLowerCase()
-    const key = (license.key || '').toLowerCase()
+  return licenses.filter((license) => {
+    const name = (license.licenseName || '').toLowerCase()
+    const productName = (license.product.productName || '').toLowerCase()
+    const key = (license.licenseKey || '').toLowerCase()
     return name.includes(query) || productName.includes(query) || key.includes(query)
   })
 })
@@ -170,15 +158,15 @@ const reactivateLicence = async (licenceId: string) => {
         class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-2xl border border-gray-200 p-4 md:items-center"
       >
         <div class="text-sm">
-          <span class="font-medium">{{ item.productName }} - {{ item.name }}</span>
+          <span class="font-medium">{{ item.product.productName }} - {{ item.licenseName }}</span>
           <span class="text-gray-500">
-            | {{ item.key }}
+            | {{ item.licenseKey }}
           </span>
           <span class="text-gray-500">
             | Status: {{ item.status }}
           </span>
           <span class="text-gray-500">
-            | Typ: {{ item.type }}
+            | Typ: {{ item.licenseType }}
           </span>
           <span class="text-gray-500">
             | Nutzung: {{ item.currentUsages }} / {{ item.maxUsages }}
