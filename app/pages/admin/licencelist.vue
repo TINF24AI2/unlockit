@@ -6,15 +6,13 @@ import type { LicenseListing } from '../../../server/services/licenses'
 const LicenseStatusValues = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
-  EXPIRED: 'EXPIRED',
-  DEACTIVATED: 'DEACTIVATED'
+  EXPIRED: 'EXPIRED'
 } as const
 
 const statusLabels: Record<LicenseStatus, string> = {
   ACTIVE: 'Aktiv',
   INACTIVE: 'Inaktiv',
-  EXPIRED: 'Abgelaufen',
-  DEACTIVATED: 'Deaktiviert'
+  EXPIRED: 'Abgelaufen'
 }
 
 type LicenseStatus = typeof LicenseStatusValues[keyof typeof LicenseStatusValues]
@@ -45,7 +43,7 @@ const queryParams = computed(() => {
 })
 
 // get licences with given query params
-const { data: licenceResponse } = await useFetch<{ success: boolean, data: LicenseListing[] }>('/api/license-keys', {
+const { data: licenceResponse, refresh: refreshLicenses } = await useFetch<{ success: boolean, data: LicenseListing[] }>('/api/license-keys', {
   method: 'GET',
   query: queryParams,
   watch: [queryParams]
@@ -95,6 +93,29 @@ const filteredLicenses = computed(() => {
 
 const goAddProduct = () => {
   navigateTo('/admin/add_product')
+}
+
+const disableLicence = async (licenceId: string, reason: string) => {
+  try {
+    await $fetch(`/api/license-keys/deactivate/${licenceId}`, {
+      method: 'POST',
+      body: { reason }
+    })
+    await refreshLicenses()
+  } catch (error) {
+    alert(`Fehler beim Deaktivieren der Lizenz ${error}`)
+  }
+}
+
+const reactivateLicence = async (licenceId: string) => {
+  try {
+    await $fetch(`/api/license-keys/reactivate/${licenceId}`, {
+      method: 'POST'
+    })
+    await refreshLicenses()
+  } catch (error) {
+    alert(`Fehler beim Reaktivieren der Lizenz ${error}`)
+  }
 }
 </script>
 
@@ -166,12 +187,24 @@ const goAddProduct = () => {
 
         <div class="grid grid-cols-2 gap-2">
           <UButton
+            v-if="item.status === 'ACTIVE'"
             type="button"
             color="error"
             variant="solid"
             block
+            @click="disableLicence(item.id, 'Test')"
           >
             Deaktivieren
+          </UButton>
+          <UButton
+            v-else-if="item.status === 'INACTIVE'"
+            type="button"
+            color="success"
+            variant="solid"
+            block
+            @click="reactivateLicence(item.id)"
+          >
+            Reaktivieren
           </UButton>
         </div>
       </div>
