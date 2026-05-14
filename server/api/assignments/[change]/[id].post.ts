@@ -1,3 +1,5 @@
+import type { AssignmentStatus } from '~~/generated/prisma/enums'
+
 export default defineEventHandler(async (event) => {
   await authorize(event, isAdmin)
 
@@ -45,7 +47,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const newStatus = change === 'approve' ? 'APPROVED' : change === 'reject' ? 'REJECTED' : 'REVOKED'
+  const newStatus: AssignmentStatus = change === 'approve' ? 'APPROVED' : change === 'reject' ? 'REJECTED' : 'REVOKED' as AssignmentStatus
 
   if (assignment.status === newStatus) {
     throw createError({
@@ -65,8 +67,18 @@ export default defineEventHandler(async (event) => {
     where: { id },
     data: {
       status: newStatus,
-      processedAt: new Date(),
-      processedById: Number(sessionUser.id)
+      history: {
+        create: {
+          id: crypto.randomUUID(),
+          newStatus: newStatus,
+          oldStatus: assignment.status as AssignmentStatus,
+          changedBy: {
+            connect: {
+              id: Number(sessionUser.id)
+            }
+          }
+        }
+      }
     }
   })
 
