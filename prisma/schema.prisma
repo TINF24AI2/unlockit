@@ -84,17 +84,30 @@ model LicenseAssignment {
   userId         Int
   status         AssignmentStatus @default(PENDING)
   requestedAt    DateTime         @default(now())
-  processedAt    DateTime?
-  processedById  Int?
   assignmentNote String?
   licenseKey     LicenseKey       @relation(fields: [licenseKeyId], references: [id])
-  processedBy    User?            @relation("LicenseAssignmentProcessedBy", fields: [processedById], references: [id])
   user           User             @relation("LicenseAssignmentUser", fields: [userId], references: [id])
+
+  history AssignmentHistory[]
 
   @@index([licenseKeyId])
   @@index([userId])
-  @@index([processedById])
   @@map("license_assignments")
+}
+
+model AssignmentHistory {
+  id                  String           @id
+  licenseAssignmentId String
+  oldStatus           AssignmentStatus
+  newStatus           AssignmentStatus
+  changedAt           DateTime         @default(now())
+  changedById         Int
+
+  licenseAssignment LicenseAssignment @relation(fields: [licenseAssignmentId], references: [id])
+  changedBy         User              @relation(fields: [changedById], references: [id])
+
+  @@index([licenseAssignmentId])
+  @@index([changedById])
 }
 
 model User {
@@ -110,11 +123,11 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdUsers                User[]              @relation("UserCreatedBy")
-  processedLicenseAssignments LicenseAssignment[] @relation("LicenseAssignmentProcessedBy")
-  licenseAssignments          LicenseAssignment[] @relation("LicenseAssignmentUser")
-  licenseKeys                 LicenseKey[]
-  products                    Product[]
+  createdUsers                       User[]              @relation("UserCreatedBy")
+  processedLicenseAssignmentsHistory AssignmentHistory[]
+  licenseAssignments                 LicenseAssignment[] @relation("LicenseAssignmentUser")
+  licenseKeys                        LicenseKey[]
+  products                           Product[]
 
   @@index([createdById])
   @@index([email])
