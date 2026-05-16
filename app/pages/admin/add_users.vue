@@ -51,7 +51,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
   notification.value = null
 
   try {
-    await $fetch('/api/users/users', {
+    await $fetch('/api/users', {
       method: 'POST',
       body: event.data
     })

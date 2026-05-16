@@ -31,7 +31,7 @@ async function login(data: { email: string, password: string }) {
     if (CurrentUser.permissions.includes('ADMIN')) {
       return navigateTo('/admin/homepage')
     } else {
-      return navigateTo('/')
+      return navigateTo('/user/homepage')
     }
   } catch {
     alert('Bad Credentials')
