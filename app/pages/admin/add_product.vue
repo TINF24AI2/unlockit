@@ -11,6 +11,7 @@ const schema = z.object({
   selectedProductId: z.string().nullable(),
   productName: z.string().optional(),
   licenseName: z.string().min(1, 'Lizenzname ist erforderlich'),
+  requiresAdminApproval: z.boolean(),
   numberOfVolumeLicences: z.number().min(0),
   numberOfSingleLicences: z.number().min(0),
   volumeLicenceCodes: z.array(z.object({
@@ -28,6 +29,7 @@ const state = reactive({
   selectedProductId: null as string | null,
   productName: '',
   licenseName: '',
+  requiresAdminApproval: true,
   numberOfVolumeLicences: 0,
   numberOfSingleLicences: 0,
   volumeLicenceCodes: [] as { code: string, maxUsage: number }[],
@@ -115,7 +117,8 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
           licenseName: data.licenseName,
           licenseKey: licence.code,
           licenseType: 'VOLUME',
-          maxUsages: licence.maxUsage
+          maxUsages: licence.maxUsage,
+          requiresAdminApproval: data.requiresAdminApproval
         }
       })),
       ...data.singleLicenceCodes.map(licence => $fetch('/api/license-keys', {
@@ -125,7 +128,8 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
           licenseName: data.licenseName,
           licenseKey: licence.code,
           licenseType: 'SINGLE',
-          maxUsages: 1
+          maxUsages: 1,
+          requiresAdminApproval: data.requiresAdminApproval
         }
       }))
     ]
@@ -204,6 +208,11 @@ const goBack = () => {
           class="w-full"
         />
       </UFormField>
+
+      <UCheckbox
+        v-model="state.requiresAdminApproval"
+        label="Die Lizenzanfrage muss von einem Admin genehmigt werden"
+      />
 
       <UFormField
         label="Anzahl Volumenlizenzen"
