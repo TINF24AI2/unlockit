@@ -11,8 +11,8 @@ const goManageUsers = () => {
   navigateTo('/admin/manage_users')
 }
 
-const goManageProducts = () => { // TODO change to the manage_products site which still isn't implemented
-  navigateTo('/admin/add_product')
+const goManageProducts = () => {
+  navigateTo('/admin/licencelist')
 }
 
 const search = ref('')

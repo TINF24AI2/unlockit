@@ -37,7 +37,7 @@ const state = reactive({
 const isSubmitting = ref(false)
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
-const { data: existingProducts, refresh: refreshProducts } = await useFetch('/api/products/products', {
+const { data: existingProducts, refresh: refreshProducts } = await useFetch('/api/products', {
   method: 'GET',
   default: () => [],
   transform: (response: { data: { id: string, productName: string }[] }) => {
@@ -95,7 +95,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
     const data = event.data
 
     if (!productId && data.productName) {
-      const productResponse = await $fetch('/api/products/products', {
+      const productResponse = await $fetch('/api/products', {
         method: 'POST',
         body: { productName: data.productName }
       })
@@ -108,7 +108,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
     }
 
     const licensePromises = [
-      ...data.volumeLicenceCodes.map(licence => $fetch('/api/license-keys/license-keys', {
+      ...data.volumeLicenceCodes.map(licence => $fetch('/api/license-keys', {
         method: 'POST',
         body: {
           productId,
@@ -118,7 +118,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
           maxUsages: licence.maxUsage
         }
       })),
-      ...data.singleLicenceCodes.map(licence => $fetch('/api/license-keys/license-keys', {
+      ...data.singleLicenceCodes.map(licence => $fetch('/api/license-keys', {
         method: 'POST',
         body: {
           productId,
@@ -145,7 +145,7 @@ const goHomepage = () => {
   navigateTo('/admin/homepage')
 }
 const goBack = () => {
-  navigateTo('/admin/homepage')
+  navigateTo('/admin/licencelist')
 }
 </script>
 
