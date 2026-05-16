@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
+definePageMeta({
+  middleware: ['authenticated']
+})
+
 type UserLicense = {
   id: string
   licenseName: string
+  licenseType: string
   status: string
   product: { id: string, productName: string }
-  userAssignment: { status: string | null }
+  userAssignment?: { status: string | null } | null
   canRequest: boolean
 }
 
@@ -51,18 +56,29 @@ const filteredLicenses = computed(() => {
 
 // Small status label for the badge.
 const getLicenseStatus = (l: UserLicense) => {
-  if (l.userAssignment.status === 'APPROVED') return 'Im Besitz'
-  if (l.userAssignment.status === 'PENDING') return 'Antrag in Bearbeitung'
+  const status = l.userAssignment?.status
+
+  if (status === 'APPROVED') return 'Im Besitz'
+  if (status === 'PENDING') return 'Antrag in Bearbeitung'
   if (l.canRequest) return 'Verfügbar'
   return 'Fehler'
 }
 
 // Badge color follows the status
 const getStatusColor = (l: UserLicense) => {
-  if (l.userAssignment.status === 'APPROVED') return 'neutral'
-  if (l.userAssignment.status === 'PENDING') return 'warning'
+  const status = l.userAssignment?.status
+
+  if (status === 'APPROVED') return 'neutral'
+  if (status === 'PENDING') return 'warning'
   if (l.canRequest) return 'primary'
   return 'error'
+}
+
+// Get license type label
+const getLicenseTypeLabel = (licenseType: string) => {
+  if (licenseType === 'VOLUME') return 'Volumenlizenz'
+  if (licenseType === 'SINGLE') return 'Einzellizenz'
+  return licenseType
 }
 
 // Go to the request page with the selected product data
@@ -80,7 +96,7 @@ const requestLicense = (license: UserLicense) => {
 
 <template>
   <Container class="p-6 relative pb-20">
-    <div class="grid mb-6 gap-2">
+    <div class="text-center">
       <h2
         class="mb-4 text-xl font-semibold"
         align="center"
@@ -127,6 +143,9 @@ const requestLicense = (license: UserLicense) => {
       >
         <div class="text-sm">
           <span class="font-medium">{{ item.product.productName }} - {{ item.licenseName }}</span>
+          <span class="text-gray-500 text-xs ml-2">
+            | {{ getLicenseTypeLabel(item.licenseType) }}
+          </span>
           <UBadge
             :color="getStatusColor(item)"
             variant="subtle"

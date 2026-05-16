@@ -1,5 +1,7 @@
 <script setup>
-import Container from '@/components/Container.vue'
+definePageMeta({
+  middleware: ['authenticated']
+})
 
 // Navigation
 const goHistory = () => {

@@ -30,7 +30,7 @@ const deactivationReasons = ref<Record<string, string>>({})
 const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string }[] }>('/api/products')
 
 const queryParams = computed(() => {
-  const params: { status?: LicenseStatus, productId?: string, onlyActive?: boolean } = {}
+  const params: { view: string, status?: LicenseStatus, productId?: string, onlyActive?: boolean } = { view: 'admin' } // need to specify admin view show get deactivated licenses
   if (statusFilter.value) {
     params.status = statusFilter.value
   }

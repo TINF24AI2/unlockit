@@ -3,6 +3,10 @@ import { ref } from 'vue' // for form state and submission handling
 import * as z from 'zod' // for form validation
 import type { FormSubmitEvent } from '#ui/types' // for typing the form submission event
 
+definePageMeta({
+  middleware: ['authenticated']
+})
+
 const schema = z.object({
   productId: z.string().min(1, 'Produkt-ID ist erforderlich'),
   reason: z.string().min(3, 'Eine Begründung ist erforderlich')
@@ -38,10 +42,12 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
 
     // Show success message and automatically navigate back to license list
     notification.value = { message: 'Lizenzanfrage erfolgreich gesendet.', type: 'success' }
-    setTimeout(() => navigateTo('/user/licenselist'), 1500)
+    setTimeout(async () => {
+      await navigateTo('/user/licenselist')
+    }, 1500)
   } catch (error) {
     console.error(error)
-    notification.value = { message: 'Fehler bei der Anfrage. Die Lizenz wurde bereits beantragt bzw. erteilt.', type: 'failure' }
+    notification.value = { message: 'Fehler bei der Anfrage. Zum Produkt besteht bereits eine Lizenzabfrage', type: 'failure' }
   } finally {
     isSubmitting.value = false
   }

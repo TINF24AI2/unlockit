@@ -16,7 +16,7 @@ export default defineEventHandler(async (event: H3Event) => {
   const view = (query.view as string | undefined)?.toLowerCase()
 
   // Admin view: show all licenses with optional filters
-  if (isAdministrator && view !== 'user') {
+  if (isAdministrator && view === 'admin') {
     const productId = query.productId as string | undefined
     const statusQuery = query.status as string | undefined
     const status = statusQuery && Object.values(LicenseStatus).includes(statusQuery as LicenseStatus)
