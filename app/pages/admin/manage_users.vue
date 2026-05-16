@@ -8,7 +8,7 @@ definePageMeta({
 const search = ref('')
 
 // API call
-const { data: usersResponse, refresh } = await useFetch('/api/users/users', {
+const { data: usersResponse, refresh } = await useFetch('/api/users', {
   method: 'GET'
 })
 
@@ -46,10 +46,9 @@ const toggleAdmin = async (id) => {
   const nextPermissions = selectedUser.admin ? [] : ['ADMIN']
 
   try {
-    await $fetch('/api/users/user-permissions', {
-      method: 'PATCH',
+    await $fetch(`/api/users/permissions/${id}`, {
+      method: 'POST',
       body: {
-        id,
         permissions: nextPermissions
       }
     })

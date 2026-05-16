@@ -15,6 +15,10 @@ const goManageProducts = () => {
   navigateTo('/admin/licencelist')
 }
 
+const goApply = () => {
+  navigateTo('/user/licenselist')
+}
+
 const search = ref('')
 // Mock-Up Data for the history
 const mockData = [
@@ -62,6 +66,14 @@ const filteredData = computed(() => {
           class="justify-center"
         >
           Lizenzgenehmigung
+        </UButton>
+
+        <UButton
+          color="neutral"
+          class="justify-center"
+          @click="goApply"
+        >
+          Produkte/Lizenzen beantragen
         </UButton>
 
         <UButton
