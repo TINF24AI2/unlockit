@@ -23,6 +23,10 @@ const history = () => {
   navigateTo('/user/user_history')
 }
 
+const goAudit = () => {
+  navigateTo('/admin/audit')
+}
+
 const search = ref('')
 // Mock-Up Data for the history
 const mockData = [
@@ -86,6 +90,14 @@ const filteredData = computed(() => {
           @click="goManageUsers"
         >
           Verwaltung User
+        </UButton>
+
+        <UButton
+          color="neutral"
+          class="justify-center"
+          @click="goAudit"
+        >
+          Historie aller Lizenz-Anfragen
         </UButton>
 
         <UButton
