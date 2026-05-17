@@ -23,14 +23,8 @@ const columns: TableColumn<LicenseAssignmentHistoryEntry>[] = [
     cell: ({ row }) => row.original.processedAt ? new Date(row.original.processedAt).toLocaleDateString('de-DE') : '-'
   },
   {
-    id: 'processedByName',
-    header: 'Bearbeitet von',
-    cell: ({ row }) => row.original.processedBy?.name ?? '-'
-
-  },
-  {
     id: 'processedByEmail',
-    header: 'E-Mail',
+    header: 'Bearbeitet von',
     cell: ({ row }) => row.original.processedBy?.email ?? '-'
   },
   {
