@@ -1,7 +1,7 @@
 import { defineEventHandler, type H3Event } from 'h3'
 import { prisma } from '../../utils/prisma'
 
-export default defineEventHandler(async (event: H3Event) => {
+export default defineEventHandler(async (event: H3Event): Promise<{ success: boolean, data: LicenseAssignmentHistoryEntry[] }> => {
   await authorize(event, isUser)
 
   const session = await requireUserSession(event)
@@ -15,12 +15,20 @@ export default defineEventHandler(async (event: H3Event) => {
       id: true,
       status: true,
       requestedAt: true,
-      processedAt: true,
       assignmentNote: true,
-      processedBy: {
+      history: {
+        take: 1,
+        orderBy: { changedAt: 'desc' },
         select: {
-          email: true,
-          name: true
+          id: true,
+          changedBy: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          },
+          changedAt: true
         }
       },
       licenseKey: {
@@ -42,8 +50,35 @@ export default defineEventHandler(async (event: H3Event) => {
     }
   })
 
+  const formattedAssignments: LicenseAssignmentHistoryEntry[] = assignments.map(assignment => ({
+    id: assignment.id,
+    status: assignment.status,
+    requestedAt: assignment.requestedAt,
+    assignmentNote: assignment.assignmentNote,
+    processedAt: assignment.history.length > 0 ? assignment.history[0]!.changedAt : null,
+    processedBy: assignment.history.length > 0
+      ? {
+          id: assignment.history[0]!.changedBy.id,
+          name: assignment.history[0]!.changedBy.name,
+          email: assignment.history[0]!.changedBy.email
+        }
+      : null,
+    licenseKey: {
+      id: assignment.licenseKey.id,
+      licenseName: assignment.licenseKey.licenseName,
+      licenseType: assignment.licenseKey.licenseType,
+      status: assignment.licenseKey.status,
+      expiresAt: assignment.licenseKey.expiresAt,
+      product: {
+        id: assignment.licenseKey.product.id,
+        productName: assignment.licenseKey.product.productName,
+        vendor: assignment.licenseKey.product.vendor
+      }
+    }
+  }))
+
   return {
     success: true,
-    data: assignments
+    data: formattedAssignments
   }
 })
