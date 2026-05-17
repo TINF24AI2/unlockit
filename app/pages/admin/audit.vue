@@ -175,7 +175,7 @@ const getStatusColor = (status: string) => {
         <!-- Right side: Audit Info -->
         <div class="text-xs text-gray-400 justify-self-end text-right">
           Geändert von
-          <span class="font-semibold">{{ item.changedBy.name || item.changedBy.email }}</span>
+          <span class="font-semibold">{{ item.changedBy.email }}</span>
           <div>am {{ formatDate(item.changedAt) }}</div>
         </div>
       </div>
