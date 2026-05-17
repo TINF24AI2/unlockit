@@ -150,7 +150,7 @@ const getStatusColor = (status: string) => {
           <div>
             <span class="font-medium">{{ item.licenseAssignment.licenseKey.product.productName }} - {{ item.licenseAssignment.licenseKey.licenseName }}</span>
             <span class="text-gray-600"> für </span>
-            <span class="font-medium">{{ item.licenseAssignment.user.name || item.licenseAssignment.user.email }}</span>
+            <span class="font-medium">{{ item.licenseAssignment.user.email }}</span>
           </div>
           <div class="text-sm text-gray-500 flex items-center gap-2 mt-1">
             <span>Status:</span>
