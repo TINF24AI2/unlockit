@@ -49,7 +49,7 @@ const columns: TableColumn<LicenseAssignmentHistoryEntry>[] = [
   },
   {
     accessorKey: 'assignmentNote',
-    header: 'Notiz'
+    header: 'Begründung für Antrag'
   }
 ]
 </script>
