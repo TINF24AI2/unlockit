@@ -52,6 +52,27 @@ const columns: TableColumn<LicenseAssignmentHistoryEntry>[] = [
     header: 'Begründung für Antrag'
   }
 ]
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case 'PENDING': return 'In Bearbeitung'
+    case 'APPROVED': return 'Akzeptiert'
+    case 'REJECTED': return 'Abgelehnt'
+    case 'REVOKED': return 'Zurückgezogen'
+    default: return status
+  }
+}
+
+// get badge color based on status
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'PENDING': return 'neutral'
+    case 'APPROVED': return 'primary'
+    case 'REJECTED': return 'error'
+    case 'REVOKED': return 'warning'
+    default: return 'neutral'
+  }
+}
 </script>
 
 <template>
@@ -64,6 +85,16 @@ const columns: TableColumn<LicenseAssignmentHistoryEntry>[] = [
       td: 'text-gray-700'
     }"
   >
+    <template #status-cell="{ row }">
+      <UBadge
+        :color="getStatusColor(row.original.status)"
+        variant="subtle"
+        size="md"
+      >
+        {{ getStatusLabel(row.original.status) }}
+      </UBadge>
+    </template>
+
     <template #empty>
       <div class="py-6 text-center text-gray-500">
         Keine Daten vorhanden
