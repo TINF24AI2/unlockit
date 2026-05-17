@@ -19,7 +19,7 @@ const goApply = () => {
   navigateTo('/user/licenselist')
 }
 
-const history = () => {
+const goHistory = () => {
   navigateTo('/user/user_history')
 }
 
@@ -103,9 +103,9 @@ const filteredData = computed(() => {
         <UButton
           color="neutral"
           class="justify-center"
-          @click="history"
+          @click="goHistory"
         >
-          Historie
+          Persönliche Historie
         </UButton>
         <UButton
           color="neutral"
