@@ -19,6 +19,10 @@ const goApply = () => {
   navigateTo('/user/licenselist')
 }
 
+const history = () => {
+  navigateTo('/user/user_history')
+}
+
 const search = ref('')
 // Mock-Up Data for the history
 const mockData = [
@@ -84,6 +88,13 @@ const filteredData = computed(() => {
           Verwaltung User
         </UButton>
 
+        <UButton
+          color="neutral"
+          class="justify-center"
+          @click="history"
+        >
+          Historie
+        </UButton>
         <UButton
           color="neutral"
           class="justify-center"
