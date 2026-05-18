@@ -76,9 +76,6 @@ const getStatusColor = (status: string) => {
 </script>
 
 <template>
-  <h2 class="text-center mb-6 text-2xl">
-    Nutzerhistorie
-  </h2>
   <div class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto">
     <UTable
       :data="rows"
