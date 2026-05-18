@@ -14,7 +14,7 @@ const statusLabels: Record<LicenseStatus, string> = {
   ACTIVE: 'Aktiv',
   INACTIVE: 'Inaktiv',
   EXPIRED: 'Abgelaufen',
-  EXHAUSTED: 'Aufgebraucht'
+  EXHAUSTED: 'Vergeben'
 }
 
 type LicenseStatus = typeof LicenseStatusValues[keyof typeof LicenseStatusValues]
