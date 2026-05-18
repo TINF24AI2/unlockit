@@ -113,6 +113,12 @@ const reactivateLicence = async (licenceId: string) => {
     alert(`Fehler beim Reaktivieren der Lizenz ${error}`)
   }
 }
+
+const getStatusColor = (status: string) => {
+  if (status === 'ACTIVE') return 'primary'
+  if (status === 'INACTIVE') return 'error'
+  else return 'neutral'
+}
 </script>
 
 <template>
@@ -165,23 +171,26 @@ const reactivateLicence = async (licenceId: string) => {
         :key="item.id"
         class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-2xl border border-gray-200 p-4 md:items-center"
       >
-        <div class="text-sm">
-          <span class="font-medium">{{ item.product.productName }} - {{ item.licenseName }}</span>
-          <span class="text-gray-500">
-            | {{ item.licenseKey }}
-          </span>
-          <span class="text-gray-500">
-            | Status: {{ item.status }}
-          </span>
-          <span class="text-gray-500">
-            | Typ: {{ item.licenseType }}
-          </span>
-          <span class="text-gray-500">
-            | Nutzung: {{ item.currentUsages }} / {{ item.maxUsages }}
-          </span>
+        <div class="text-sm space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="font-medium">{{ item.product.productName }} - {{ item.licenseName }}</span>
+            <UBadge
+              :color="getStatusColor(item.status)"
+              variant="subtle"
+            >
+              {{ item.status }}
+            </UBadge>
+          </div>
+          <div>
+            <span class="text-gray-500">Schlüssel: </span>
+            <span class="font-semibold text-gray-700">{{ item.licenseKey }}</span>
+          </div>
+          <div class="text-gray-500">
+            Typ: {{ item.licenseType }} | Nutzung: {{ item.currentUsages }} / {{ item.maxUsages }}
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 gap-2">
           <UPopover
             v-if="item.status === 'ACTIVE'"
             :key="`popover-${item.id}`"
