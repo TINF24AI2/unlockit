@@ -6,13 +6,15 @@ import type { LicenseListing } from '../../../server/services/licenses'
 const LicenseStatusValues = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
-  EXPIRED: 'EXPIRED'
+  EXPIRED: 'EXPIRED',
+  EXHAUSTED: 'EXHAUSTED'
 } as const
 
 const statusLabels: Record<LicenseStatus, string> = {
   ACTIVE: 'Aktiv',
   INACTIVE: 'Inaktiv',
-  EXPIRED: 'Abgelaufen'
+  EXPIRED: 'Abgelaufen',
+  EXHAUSTED: 'Aufgebraucht'
 }
 
 type LicenseStatus = typeof LicenseStatusValues[keyof typeof LicenseStatusValues]
@@ -115,9 +117,13 @@ const reactivateLicence = async (licenceId: string) => {
 }
 
 const getStatusColor = (status: string) => {
-  if (status === 'ACTIVE') return 'primary'
-  if (status === 'INACTIVE') return 'error'
-  else return 'neutral'
+  switch (status) {
+    case 'ACTIVE': return 'primary'
+    case 'INACTIVE': return 'error'
+    case 'EXPIRED': return 'neutral'
+    case 'EXHAUSTED': return 'warning'
+    default: return 'neutral'
+  }
 }
 </script>
 
@@ -178,7 +184,7 @@ const getStatusColor = (status: string) => {
               :color="getStatusColor(item.status)"
               variant="subtle"
             >
-              {{ item.status }}
+              {{ statusLabels[item.status] }}
             </UBadge>
           </div>
           <div>
