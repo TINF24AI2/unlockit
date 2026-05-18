@@ -5,7 +5,7 @@ definePageMeta({
 
 // Navigation
 const goHistory = () => {
-  // Placeholder
+  navigateTo('/user/user_history')
 }
 
 const goApply = () => {

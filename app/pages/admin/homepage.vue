@@ -19,6 +19,10 @@ const goApply = () => {
   navigateTo('/user/licenselist')
 }
 
+const goHistory = () => {
+  navigateTo('/user/user_history')
+}
+
 const goAudit = () => {
   navigateTo('/admin/audit')
 }
@@ -96,6 +100,13 @@ const filteredData = computed(() => {
           Historie aller Lizenz-Anfragen
         </UButton>
 
+        <UButton
+          color="neutral"
+          class="justify-center"
+          @click="goHistory"
+        >
+          Persönliche Historie
+        </UButton>
         <UButton
           color="neutral"
           class="justify-center"
