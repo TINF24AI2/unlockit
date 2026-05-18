@@ -50,11 +50,6 @@ const accountItems = [
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
-    label: 'Startseite',
-    to: home.value,
-    active: route.path.startsWith(home.value)
-  },
-  {
     label: 'Lizenz beantragen',
     to: '/user/licenselist',
     active: route.path.startsWith('/user/licenselist')
