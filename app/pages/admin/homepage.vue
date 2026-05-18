@@ -12,7 +12,7 @@ const goManageUsers = () => {
 }
 
 const goManageProducts = () => {
-  navigateTo('/admin/licencelist')
+  navigateTo('/admin/licenselist')
 }
 
 const goApply = () => {
