@@ -68,9 +68,6 @@ const deleteUser = () => {
 const goCreateUser = () => {
   navigateTo('/admin/add_users')
 }
-const goHomepage = () => {
-  navigateTo('/admin/homepage')
-}
 </script>
 
 <template>
@@ -144,15 +141,6 @@ const goHomepage = () => {
         @click="goCreateUser"
       >
         User hinzufügen
-      </UButton>
-    </div>
-    <div class="flex justify-end mt-6">
-      <UButton
-        type="button"
-        variant="ghost"
-        @click="goHomepage"
-      >
-        Zurück zur Startseite
       </UButton>
     </div>
   </Container>

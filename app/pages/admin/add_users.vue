@@ -89,11 +89,6 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
   }
 }
 
-// navigations
-const goHomepage = () => {
-  navigateTo('/admin/homepage')
-}
-
 const goBack = () => {
   navigateTo('/admin/manage_users')
 }
@@ -187,15 +182,5 @@ const goBack = () => {
         </UButton>
       </div>
     </UForm>
-
-    <div class="flex justify-end mt-6">
-      <UButton
-        type="button"
-        variant="ghost"
-        @click="goHomepage"
-      >
-        Zurück zur Startseite
-      </UButton>
-    </div>
   </Container>
 </template>
