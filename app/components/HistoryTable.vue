@@ -76,29 +76,34 @@ const getStatusColor = (status: string) => {
 </script>
 
 <template>
-  <UTable
-    :data="rows"
-    :columns="columns"
-    :loading="loading"
-    :ui="{
-      th: 'text-black font-semibold',
-      td: 'text-gray-700'
-    }"
-  >
-    <template #status-cell="{ row }">
-      <UBadge
-        :color="getStatusColor(row.original.status)"
-        variant="subtle"
-        size="md"
-      >
-        {{ getStatusLabel(row.original.status) }}
-      </UBadge>
-    </template>
+  <h2 class="text-center mb-6 text-2xl">
+    Nutzerhistorie
+  </h2>
+  <div class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto">
+    <UTable
+      :data="rows"
+      :columns="columns"
+      :loading="loading"
+      :ui="{
+        td: 'text-gray-500 py-4',
+        th: 'text-black-700 font-semibold'
+      }"
+    >
+      <template #status-cell="{ row }">
+        <UBadge
+          :color="getStatusColor(row.original.status)"
+          variant="subtle"
+          size="md"
+        >
+          {{ getStatusLabel(row.original.status) }}
+        </UBadge>
+      </template>
 
-    <template #empty>
-      <div class="py-6 text-center text-gray-500">
-        Keine Daten vorhanden
-      </div>
-    </template>
-  </UTable>
+      <template #empty>
+        <div class="py-6 text-center text-gray-500">
+          Keine Daten vorhanden
+        </div>
+      </template>
+    </UTable>
+  </div>
 </template>
