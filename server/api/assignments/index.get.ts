@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     },
     select: {
       id: true,
+      assignmentNote: true,
       requestedAt: true,
       status: true,
       user: {
