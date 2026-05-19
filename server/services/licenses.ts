@@ -316,6 +316,7 @@ export async function getLicensesWithUserContext(
       },
       assignments: {
         where: { userId: userId },
+        orderBy: { requestedAt: 'desc' },
         select: {
           status: true
         }
