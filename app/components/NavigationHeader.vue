@@ -23,6 +23,11 @@ const adminItems: NavigationMenuItem[] = [
     active: route.path.startsWith('/admin/add_product')
   },
   {
+    label: 'Lizenzanfragen',
+    to: '/admin/manage_assignments',
+    active: route.path.startsWith('/admin/manage_assignments')
+  },
+  {
     label: 'Nutzer verwalten',
     to: '/admin/manage_users',
     active: route.path.startsWith('/admin/manage_users')

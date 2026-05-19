@@ -15,6 +15,10 @@ const goManageProducts = () => {
   navigateTo('/admin/licenselist')
 }
 
+const goManageAssignments = () => {
+  navigateTo('/admin/manage_assignments')
+}
+
 const goApply = () => {
   navigateTo('/user/licenselist')
 }
@@ -72,6 +76,7 @@ const filteredData = computed(() => {
         <UButton
           color="neutral"
           class="justify-center"
+          @click="goManageAssignments"
         >
           Lizenzgenehmigung
         </UButton>
