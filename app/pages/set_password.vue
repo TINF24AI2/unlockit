@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import SetPassword from '~/components/SetPassword.vue'
 
-definePageMeta({
-  middleware: ['authenticated']
-})
-
 async function reset(data: {
   email: string
   oldPassword: string
