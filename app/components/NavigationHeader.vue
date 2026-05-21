@@ -16,7 +16,7 @@ const isAdmin = computed(() =>
 
 const home = computed(() => isAdmin.value ? '/admin/homepage' : '/user/homepage')
 
-const adminItems: NavigationMenuItem[] = [
+const adminItems = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Produkte/ Lizenzen hinzufügen',
     to: '/admin/add_product',
@@ -37,7 +37,7 @@ const adminItems: NavigationMenuItem[] = [
     to: '/admin/audit',
     active: route.path.startsWith('/admin/audit')
   }
-]
+])
 
 const accountItems = [
   {
@@ -60,7 +60,7 @@ const items = computed<NavigationMenuItem[]>(() => [
     active: route.path.startsWith('/user/licenselist')
   },
 
-  ...(isAdmin.value ? adminItems : [])
+  ...(isAdmin.value ? adminItems.value : [])
 ])
 </script>
 
