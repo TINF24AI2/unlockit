@@ -96,7 +96,7 @@ const formatDate = (dateString: string) => {
 <template>
   <div class="p-6">
     <!-- Title -->
-    <h1 class="text-center mb-6 text-2xl">
+    <h1 class="text-center mb-6 text-2xl font-semibold">
       Herzlich Willkommen Admin
     </h1>
 
@@ -169,7 +169,7 @@ const formatDate = (dateString: string) => {
         />
 
         <div class="grid mb-6 gap-2">
-          <span class="text-center">
+          <span class="text-center font-semibold text-xl">
             Einblick in offene Lizenzanfragen
           </span>
         </div>
