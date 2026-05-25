@@ -1,5 +1,5 @@
-<script setup>
-import { ref, computed } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import Container from '@/components/Container.vue'
 
 definePageMeta({
@@ -31,28 +31,66 @@ const goAudit = () => {
   navigateTo('/admin/audit')
 }
 
-const search = ref('')
-// Mock-Up Data for the history
-const mockData = [
-  { id: 1, product: 'Microsoft Word 2017', user: 'Mia Müller', date: '26.04.2026', status: 'genehmigt' },
-  { id: 2, product: 'Microsoft Word 2017', user: 'Max Münzner', date: '17.03.2026', status: 'abgelehnt' },
-  { id: 3, product: 'Microsoft Word 2020', user: 'Mia Müller', date: '02.02.2026', status: 'in Bearbeitung' },
-  { id: 4, product: 'Microsoft Excel 2019', user: 'Max Münzner', date: '19.01.2026', status: 'abgelehnt' }
-]
+type LicenseAssignment = {
+  id: string
+  assignmentNote: string
+  requestedAt: string
+  status: string
+  user: {
+    id: string
+    email: string
+    name: string | null
+  }
+  licenseKey: {
+    id: string
+    currentUsages: number
+    maxUsages: number
+    licenseName: string
+    licenseType: string
+    status: string
+    product: {
+      id: string
+      productName: string
+    }
+  }
+}
 
-// filter data based on search input
-const filteredData = computed(() => {
-  if (!search.value) return mockData
-
-  const s = search.value.toLowerCase()
-
-  return mockData.filter(item =>
-    item.product.toLowerCase().includes(s)
-    || item.user.toLowerCase().includes(s)
-    || item.status.toLowerCase().includes(s)
-    || item.date.toLowerCase().includes(s)
-  )
+// Fetch pending license assignments for preview
+const { data: pendingAssignments } = await useFetch<LicenseAssignment[]>('/api/assignments/', {
+  method: 'GET'
 })
+
+const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
+
+// Show only the first 3 requests
+const previewAssignments = computed(() => {
+  return (pendingAssignments.value || []).slice(0, 3)
+})
+
+async function handleAssignment(assignmentId: string, change: 'approve' | 'reject') {
+  try {
+    await $fetch(`/api/assignments/${change}/${assignmentId}`, {
+      method: 'POST'
+    })
+
+    // Refresh the list after each action
+    await refreshNuxtData()
+
+    notification.value = {
+      message: `Die Lizenz wurde erfolgreich ${change === 'approve' ? 'genehmigt' : 'abgelehnt'}`,
+      type: 'success'
+    }
+  } catch (error) {
+    notification.value = {
+      message: `Die Lizenzanfrage konnte nicht bearbeitet werden: ${error}`,
+      type: 'failure'
+    }
+  }
+}
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleString()
+}
 </script>
 
 <template>
@@ -120,28 +158,125 @@ const filteredData = computed(() => {
         </UButton>
       </Container>
 
-      <!-- History -->
+      <!-- Preview panel -->
       <Container class="p-6">
-        <!-- Title -->
+        <NotificationContainer
+          v-if="notification"
+          class="mb-4"
+          :message="notification.message"
+          :type="notification.type"
+          @close="notification = null"
+        />
+
         <div class="grid mb-6 gap-2">
           <span class="text-center">
-            Historie genehmigter Beantragungen
+            Einblick in offene Lizenzanfragen
           </span>
-          <input
-            v-model="search"
-            type="text"
-            placeholder="Suchen..."
-            class="justify-self-end w-1/3 bg-white rounded-md pl-3 pr-3 py-1"
-          >
         </div>
-        <div class="bg-white rounded-3xl p-4">
-          <!-- Mock-Up Data Output -->
+        <div class="bg-white rounded-3xl p-4 space-y-3">
           <div
-            v-for="item in filteredData"
-            :key="item.id"
-            class="mb-2 text-sm"
+            v-if="previewAssignments.length === 0"
+            class="text-sm text-gray-500 text-center p-4"
           >
-            <span>{{ [item.product, item.user, item.date, item.status].join(' | ') }}</span>
+            Keine offenen Anfragen vorhanden.
+          </div>
+          <div
+            v-for="item in previewAssignments"
+            :key="item.id"
+            class="grid grid-cols-1 gap-4 rounded-2xl border border-gray-200 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start"
+          >
+            <div class="min-w-0 text-sm break-words">
+              <div class="flex flex-wrap gap-x-2 gap-y-1">
+                <span class="font-medium break-words">{{ item.licenseKey.product.productName }} - {{ item.licenseKey.licenseName }}</span>
+                <span class="text-gray-600">angefragt von</span>
+                <span class="font-medium break-words">{{ item.user.email }}</span>
+              </div>
+              <div
+                v-if="item.assignmentNote"
+                class="mt-1 text-sm italic text-gray-500 break-words whitespace-normal md:max-w-[52ch]"
+              >
+                {{ item.assignmentNote }}
+              </div>
+              <div class="mt-2 text-xs text-gray-400">
+                Angefragt am {{ formatDate(item.requestedAt) }}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 justify-items-center md:w-56 md:shrink-0">
+              <div class="flex w-full justify-center">
+                <UPopover
+                  :key="`popover-accept-${item.id}`"
+                  :ui="{ content: 'border border-brand' }"
+                  class="inline-flex"
+                >
+                  <UButton
+                    type="button"
+                    color="primary"
+                    variant="solid"
+                  >
+                    Genehmigen
+                  </UButton>
+                  <template #content="{ close }">
+                    <div class="p-4">
+                      <p class="mb-4">
+                        Möchten Sie diese Anfrage wirklich genehmigen?
+                      </p>
+                      <div class="flex justify-end gap-2">
+                        <UButton
+                          variant="ghost"
+                          @click="close"
+                        >
+                          Abbrechen
+                        </UButton>
+                        <UButton
+                          color="primary"
+                          @click="() => { handleAssignment(item.id, 'approve'); close(); }"
+                        >
+                          Bestätigen
+                        </UButton>
+                      </div>
+                    </div>
+                  </template>
+                </UPopover>
+              </div>
+
+              <div class="flex w-full justify-center">
+                <UPopover
+                  :key="`popover-reject-${item.id}`"
+                  :ui="{ content: 'border border-brand' }"
+                  class="inline-flex"
+                >
+                  <UButton
+                    type="button"
+                    color="error"
+                    variant="solid"
+                  >
+                    Ablehnen
+                  </UButton>
+                  <template #content="{ close }">
+                    <div class="p-4">
+                      <p class="mb-4">
+                        Möchten Sie diese Anfrage wirklich ablehnen?
+                      </p>
+                      <div class="flex justify-end gap-2">
+                        <UButton
+                          variant="ghost"
+                          @click="close"
+                        >
+                          Abbrechen
+                        </UButton>
+                        <UButton
+                          color="error"
+                          @click="() => { handleAssignment(item.id, 'reject'); close(); }"
+                        >
+                          Bestätigen
+                        </UButton>
+                      </div>
+                    </div>
+                  </template>
+                </UPopover>
+              </div>
+            </div>
           </div>
         </div>
       </Container>
