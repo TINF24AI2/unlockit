@@ -19,6 +19,7 @@ export type LicenseAssignmentHistoryEntry = {
     id: string
     licenseName: string
     licenseType: string
+    licenseKey: string | null
     status: string
     expiresAt: Date | null
     product: {

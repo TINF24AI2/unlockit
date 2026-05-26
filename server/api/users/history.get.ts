@@ -36,6 +36,7 @@ export default defineEventHandler(async (event: H3Event): Promise<{ success: boo
           id: true,
           licenseName: true,
           licenseType: true,
+          licenseKey: true,
           status: true,
           expiresAt: true,
           product: {
@@ -67,6 +68,7 @@ export default defineEventHandler(async (event: H3Event): Promise<{ success: boo
       id: assignment.licenseKey.id,
       licenseName: assignment.licenseKey.licenseName,
       licenseType: assignment.licenseKey.licenseType,
+      licenseKey: assignment.status == 'APPROVED' ? assignment.licenseKey.licenseKey : null,
       status: assignment.licenseKey.status,
       expiresAt: assignment.licenseKey.expiresAt,
       product: {
