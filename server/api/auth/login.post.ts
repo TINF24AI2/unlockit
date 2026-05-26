@@ -20,7 +20,8 @@ export default defineEventHandler(async (event) => {
       email: {
         equals: email,
         mode: 'insensitive'
-      }
+      },
+      status: 'ACTIVE'
     }
   })
 

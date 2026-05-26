@@ -7,7 +7,7 @@ export default defineEventHandler(async (event: H3Event) => {
   const users = await prisma.user.findMany({
     where: {
       email: {
-        contains: '@'
+        contains: '@' // Exclude system user without email and deleted users with email 'anonymous{id}'
       }
     },
     select: {
@@ -17,7 +17,8 @@ export default defineEventHandler(async (event: H3Event) => {
       permissions: true,
       createdById: true,
       createdAt: true,
-      updatedAt: true
+      updatedAt: true,
+      status: true
     },
     orderBy: {
       name: 'asc'
