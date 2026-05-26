@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     select: {
       id: true,
       status: true,
+      licenseKeyId: true,
       user: {
         select: {
           id: true,
@@ -63,24 +64,40 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await prisma.licenseAssignment.update({
-    where: { id },
-    data: {
-      status: newStatus,
-      history: {
-        create: {
-          id: crypto.randomUUID(),
-          newStatus: newStatus,
-          oldStatus: assignment.status as AssignmentStatus,
-          changedBy: {
-            connect: {
-              id: Number(sessionUser.id)
+  await prisma.$transaction([
+    prisma.licenseAssignment.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        history: {
+          create: {
+            id: crypto.randomUUID(),
+            newStatus: newStatus,
+            oldStatus: assignment.status as AssignmentStatus,
+            changedBy: {
+              connect: {
+                id: Number(sessionUser.id)
+              }
             }
           }
         }
       }
-    }
-  })
+    }),
+    // If the assignment is approved, update the license key's current usages
+    // If the assignment is revoked, decrease the current usages
+    ...(newStatus === 'APPROVED'
+      ? [prisma.licenseKey.update({
+          where: { id: assignment.licenseKeyId },
+          data: { currentUsages: { increment: 1 } }
+        })]
+      : newStatus === 'REVOKED'
+        ? [prisma.licenseKey.update({
+            where: { id: assignment.licenseKeyId },
+            data: { currentUsages: { decrement: 1 } }
+          })]
+        : [] // No additional updates needed for REJECTED status
+    )
+  ])
 
   const { sendMail } = useNodeMailer()
 
