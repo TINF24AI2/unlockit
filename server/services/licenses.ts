@@ -384,11 +384,16 @@ export async function requestLicense(
         { expiresAt: { gt: new Date() } }
       ]
     },
+    orderBy: [
+      { requiresAdminApproval: 'asc' },
+      { createdAt: 'asc' }
+    ],
     select: {
       id: true,
       productId: true,
       maxUsages: true,
       currentUsages: true,
+      requiresAdminApproval: true,
       expiresAt: true
     }
   })
@@ -425,6 +430,43 @@ export async function requestLicense(
       }
     }
   })
+
+  // If the license does not require admin approval, automatically approve it and update usage count
+  if (!availableLicense.requiresAdminApproval) {
+    const systemUser = await prisma.user.findFirst({
+      where: { email: 'system' },
+      select: { id: true }
+    })
+
+    if (!systemUser) {
+      throw new Error('System user not found – cannot auto-approve assignment')
+    }
+
+    await prisma.$transaction([
+      prisma.licenseAssignment.update({
+        where: { id: assignmentId },
+        data: {
+          status: AssignmentStatus.APPROVED,
+          history: {
+            create: {
+              id: randomUUID(),
+              oldStatus: AssignmentStatus.PENDING,
+              newStatus: AssignmentStatus.APPROVED,
+              changedBy: {
+                connect: { id: systemUser.id }
+              }
+            }
+          }
+        }
+      }),
+      prisma.licenseKey.update({
+        where: { id: availableLicense.id },
+        data: { currentUsages: { increment: 1 } }
+      })
+    ])
+
+    return { ...assignment, status: AssignmentStatus.APPROVED }
+  }
 
   return assignment
 }

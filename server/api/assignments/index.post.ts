@@ -89,7 +89,9 @@ export default defineEventHandler(async (event: H3Event): Promise<AssignmentRequ
       productId: assignment.licenseKey.productId,
       status: assignment.status,
       requestedAt: assignment.requestedAt.toISOString(),
-      message: 'License request created successfully'
+      message: assignment.status === 'APPROVED'
+        ? 'License was automatically assigned'
+        : 'License request submitted and awaiting admin approval'
     }
   }
 })
