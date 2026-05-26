@@ -117,6 +117,7 @@ model User {
   password           String
   needsPasswordReset Boolean      @default(true)
   permissions        Permission[] @default([])
+  status             UserStatus   @default(ACTIVE)
 
   createdBy   User?    @relation("UserCreatedBy", fields: [createdById], references: [id])
   createdById Int?
@@ -135,4 +136,10 @@ model User {
 
 enum Permission {
   ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DEACTIVATED
+  DELETED
 }
