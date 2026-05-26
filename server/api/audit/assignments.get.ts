@@ -1,13 +1,25 @@
 export default defineEventHandler(async (event) => {
-  await authorize(event, isAdmin)
+  await authorize(event, isUser)
+
+  const session = await requireUserSession(event)
+  const sessionUser = session.user as LoggedInUser
+  const userId = Number(sessionUser.id)
+
+  const isAdminUser = await allows(event, isAdmin)
 
   const query = getQuery(event)
   const id = query.id as string
-
-  const whereClause = id ? { id } : undefined
+  const asUser = query.role === 'user'
 
   const history = await prisma.assignmentHistory.findMany({
-    where: whereClause,
+    where: {
+      licenseAssignment: asUser || !isAdminUser
+        ? {
+            userId: userId
+          }
+        : undefined,
+      id: id ? id : undefined
+    },
     orderBy: {
       changedAt: 'desc'
     },

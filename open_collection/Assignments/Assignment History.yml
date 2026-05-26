@@ -11,6 +11,10 @@ http:
       value: ""
       type: query
       disabled: true
+    - name: role
+      value: user
+      type: query
+      disabled: true
   auth: inherit
 
 settings:
