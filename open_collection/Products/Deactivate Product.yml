@@ -1,0 +1,39 @@
+info:
+  name: Deactivate Product
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{host}}/api/products/:change/:id"
+  params:
+    - name: change
+      value: deactivate
+      type: path
+    - name: id
+      value: "{{productId}}"
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "Product no longer needed"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: pre-request
+      code: |-
+        const productId = bru.getEnvVar('productId');
+        if (!productId) {
+          console.warn('WARNING: productId is not set. Did you run "Create Product" first?');
+        } else {
+          console.log('Using productId:', productId);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
