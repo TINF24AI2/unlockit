@@ -69,6 +69,7 @@ const getStatusLabel = (status: string) => {
   switch (status) {
     case 'ACTIVE': return 'Aktiv'
     case 'DEACTIVATED': return 'Deaktiviert'
+    case 'DELETED': return 'Gelöscht'
     default: return status
   }
 }
