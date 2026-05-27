@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { createError, defineEventHandler, readBody, type H3Event } from 'h3'
 import { prisma } from '../../utils/prisma'
+import { ProductStatus } from '../../../generated/prisma/client'
 
 interface ProductPayload {
   productName?: string
@@ -28,10 +29,13 @@ export default defineEventHandler(async (event: H3Event) => {
       statusMessage: 'productName is required'
     })
   }
+
+  // Check for existing ACTIVE products with the same name (to allow reuse of deleted product names)
   const existingProduct = await prisma.product.findFirst({
     where: {
       productName,
-      createdById
+      createdById,
+      status: ProductStatus.ACTIVE
     }
   })
 
@@ -41,6 +45,7 @@ export default defineEventHandler(async (event: H3Event) => {
       statusMessage: 'Product with this name already exists'
     })
   }
+
   const product = await prisma.product.create({
     data: {
       id: randomUUID(),
@@ -48,6 +53,7 @@ export default defineEventHandler(async (event: H3Event) => {
       description: description || undefined,
       vendor: vendor || undefined,
       createdById
+      // status will default to ACTIVE via Prisma schema
     }
   })
 

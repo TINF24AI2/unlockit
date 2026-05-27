@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { prisma } from '#server/utils/prisma'
-import { AssignmentStatus, LicenseStatus, type LicenseType, type Prisma } from '../../generated/prisma/client'
+import { AssignmentStatus, LicenseStatus, ProductStatus, type LicenseType, type Prisma } from '../../generated/prisma/client'
 
 // LicenseFilter - optional filter criteria for listLicenses()
 export interface LicenseFilter {
@@ -153,9 +153,7 @@ export async function deactivateLicense(
     .filter(assignment => assignment.status === AssignmentStatus.APPROVED)
     .map(assignment => assignment.id)
 
-  const transactionOperations: Array<
-    ReturnType<typeof prisma.licenseKey.update> | ReturnType<typeof prisma.licenseAssignment.updateMany>
-  > = []
+  const transactionOperations: Array<ReturnType<typeof prisma.licenseKey.update> | ReturnType<typeof prisma.licenseAssignment.update>> = []
 
   // Update license status to INACTIVE
   transactionOperations.push(
@@ -167,27 +165,67 @@ export async function deactivateLicense(
     })
   )
 
-  // Update pending assignments to REJECTED and approved assignments to REVOKED with a note about the reason for deactivation
+  // Update pending assignments to REJECTED with history entries
   if (pendingAssignmentIds.length > 0) {
-    transactionOperations.push(
-      prisma.licenseAssignment.updateMany({
-        where: { id: { in: pendingAssignmentIds } },
-        data: {
-          status: AssignmentStatus.REJECTED,
-          assignmentNote: `License deactivated by admin. Reason: ${reason}`
-        }
-      })
-    )
+    const noteMessage = `License deactivated by admin. Reason: ${reason}`
+    for (const assignmentId of pendingAssignmentIds) {
+      transactionOperations.push(
+        prisma.licenseAssignment.update({
+          where: { id: assignmentId },
+          data: {
+            status: AssignmentStatus.REJECTED,
+            assignmentNote: noteMessage,
+            history: {
+              create: {
+                id: crypto.randomUUID(),
+                oldStatus: AssignmentStatus.PENDING,
+                newStatus: AssignmentStatus.REJECTED,
+                changedBy: {
+                  connect: {
+                    id: adminId
+                  }
+                }
+              }
+            }
+          }
+        })
+      )
+    }
   }
 
+  // Update approved assignments to REVOKED with history entries
   // Approved assignments are revoked (not rejected) to indicate they were valid but are now invalid due to deactivation
   if (approvedAssignmentIds.length > 0) {
+    const noteMessage = `License revoked due to deactivation by admin. Reason: ${reason}`
+    for (const assignmentId of approvedAssignmentIds) {
+      transactionOperations.push(
+        prisma.licenseAssignment.update({
+          where: { id: assignmentId },
+          data: {
+            status: AssignmentStatus.REVOKED,
+            assignmentNote: noteMessage,
+            history: {
+              create: {
+                id: crypto.randomUUID(),
+                oldStatus: AssignmentStatus.APPROVED,
+                newStatus: AssignmentStatus.REVOKED,
+                changedBy: {
+                  connect: {
+                    id: adminId
+                  }
+                }
+              }
+            }
+          }
+        })
+      )
+    }
+    // Decrement currentUsages for each revoked APPROVED assignment
     transactionOperations.push(
-      prisma.licenseAssignment.updateMany({
-        where: { id: { in: approvedAssignmentIds } },
+      prisma.licenseKey.update({
+        where: { id: licenseId },
         data: {
-          status: AssignmentStatus.REVOKED,
-          assignmentNote: `License revoked due to deactivation by admin. Reason: ${reason}`
+          currentUsages: { decrement: approvedAssignmentIds.length }
         }
       })
     )
@@ -225,11 +263,22 @@ export interface ReactivateLicensePayload {
 }
 
 // reactivateLicense - sets a license from INACTIVE to ACTIVE
+// Note: Cannot reactivate a license if its product is not ACTIVE
 export async function reactivateLicense(
   licenseId: string,
   adminId: number
 ): Promise<ReactivateLicensePayload> {
-  const license = await prisma.licenseKey.findUnique({ where: { id: licenseId } })
+  const license = await prisma.licenseKey.findUnique({
+    where: { id: licenseId },
+    include: {
+      product: {
+        select: {
+          id: true,
+          status: true
+        }
+      }
+    }
+  })
 
   if (!license) {
     throw new Error(`License with ID ${licenseId} not found`)
@@ -237,6 +286,10 @@ export async function reactivateLicense(
 
   if (license.status === LicenseStatus.ACTIVE) {
     throw new Error('License is already active')
+  }
+
+  if (license.product.status !== ProductStatus.ACTIVE) {
+    throw new Error('Cannot reactivate a license for a deactivated or deleted product')
   }
 
   await prisma.licenseKey.update({

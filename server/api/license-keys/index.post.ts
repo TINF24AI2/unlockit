@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { createError, defineEventHandler, readBody, type H3Event } from 'h3'
 import { prisma } from '../../utils/prisma'
-import { LicenseStatus, LicenseType } from '../../../generated/prisma/client'
+import { LicenseStatus, LicenseType, ProductStatus } from '../../../generated/prisma/client'
 
 interface LicenseKeyPayload {
   productId?: string
@@ -58,13 +58,21 @@ export default defineEventHandler(async (event: H3Event) => {
 
   const product = await prisma.product.findUnique({
     where: { id: productId },
-    select: { id: true }
+    select: { id: true, status: true }
   })
 
   if (!product) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Product not found'
+    })
+  }
+
+  // Product must be ACTIVE to add new licenses
+  if (product.status !== ProductStatus.ACTIVE) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Cannot create license for a deactivated or deleted product'
     })
   }
 

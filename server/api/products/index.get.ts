@@ -1,5 +1,6 @@
 import { defineEventHandler } from 'h3'
 import { prisma } from '../../utils/prisma'
+import { ProductStatus } from '../../../generated/prisma/client'
 
 export default defineEventHandler(async (event) => {
   await authorize(event, isUser)
@@ -9,12 +10,17 @@ export default defineEventHandler(async (event) => {
   let products
 
   if (isAdmininistrator) {
+    // Admins can see all products (including deactivated and deleted)
     products = await prisma.product.findMany({
       include: { licenseKeys: true },
       orderBy: { createdAt: 'desc' }
     })
   } else {
+    // Regular users can only see active products
     products = await prisma.product.findMany({
+      where: {
+        status: ProductStatus.ACTIVE
+      },
       select: {
         id: true,
         productName: true,
