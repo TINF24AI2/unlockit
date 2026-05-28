@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { FetchError } from 'ofetch'
 
 definePageMeta({
   middleware: ['is-admin']
@@ -98,8 +99,12 @@ const updateUserStatus = async (id: number, status: 'ACTIVE' | 'DEACTIVATED' | '
       type: 'success'
     }
   } catch (error) {
+    let errorMessage = 'Ein unbekannter Fehler ist aufgetreten.'
+    if (error instanceof FetchError && error.data?.statusMessage) {
+      errorMessage = error.data.statusMessage
+    }
     notification.value = {
-      message: `Der Nutzerstatus konnte nicht geändert werden: ${error}`,
+      message: `Der Nutzerstatus konnte nicht geändert werden: ${errorMessage}`,
       type: 'failure'
     }
   }
