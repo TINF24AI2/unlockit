@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
 
   const { id, status } = await readValidatedBody(event, bodySchema.parse)
 
+  await authorize(event, noSelfChange, id)
+
   const user = await prisma.user.findUnique({
     where: { id: id },
     select: {
