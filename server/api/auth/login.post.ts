@@ -22,6 +22,9 @@ export default defineEventHandler(async (event) => {
         mode: 'insensitive'
       },
       status: 'ACTIVE'
+    },
+    include: {
+      passwordTokens: true
     }
   })
 
@@ -31,15 +34,11 @@ export default defineEventHandler(async (event) => {
 
   const user = users[0]!
 
-  if (await verifyPassword(user.password, password)) {
-    if (user.needsPasswordReset) {
-      return {
-        success: false,
-        errorCode: 'PASSWORD_RESET_REQUIRED',
-        message: 'Password reset required'
-      }
-    }
+  if (user.password == null) {
+    badCred()
+  }
 
+  if (await verifyPassword(user.password, password)) {
     if (passwordNeedsReHash(user.password)) {
       const newHash = await hashPassword(password)
       await prisma.user.update({
@@ -57,6 +56,20 @@ export default defineEventHandler(async (event) => {
     await setUserSession(event, {
       user: sessionUser
     })
+
+    // Delete any open reset tokens, as they obviously know their password
+    if (user.passwordTokens.length > 0) {
+      try {
+        await prisma.passwordTokens.deleteMany({
+          where: {
+            userId: user.id
+          }
+        })
+      } catch {
+        // Fail silently
+      }
+    }
+
     return {
       success: true,
       data: {

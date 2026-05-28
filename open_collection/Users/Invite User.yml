@@ -1,16 +1,18 @@
 info:
-  name: Password Reset
+  name: Invite User
   type: http
-  seq: 8
+  seq: 2
 
 http:
   method: POST
-  url: "{{host}}/api/auth/password-reset"
+  url: "{{host}}/api/users"
   body:
     type: json
     data: |-
       {
-        "email": "jdoe@mail.com"
+        "email": "test@tix4u.de",
+        "username": "John Doe",
+        "admin": false
       }
   auth: inherit
 

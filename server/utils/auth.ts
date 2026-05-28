@@ -1,4 +1,4 @@
-export function badCred() {
+export function badCred(): never {
   throw createError({
     statusCode: 401,
     message: 'Bad credentials'
