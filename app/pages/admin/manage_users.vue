@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { FetchError } from 'ofetch'
+import type { LoggedInUser } from '#imports'
 
 definePageMeta({
   middleware: ['is-admin']
@@ -9,6 +10,7 @@ definePageMeta({
 const search = ref('')
 const onlyActiveFilter = ref(false)
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
+const { user } = useUserSession() as { user: Ref<LoggedInUser | null> }
 
 // API call
 const { data: usersResponse, refresh } = await useFetch('/api/users', {
@@ -179,6 +181,7 @@ const goCreateUser = () => {
         <div class="flex flex-col md:flex-row gap-2 md:items-center">
           <!-- Common Button -->
           <UButton
+            v-if="item.id !== user?.id"
             type="button"
             color="primary"
             variant="solid"
@@ -190,7 +193,7 @@ const goCreateUser = () => {
 
           <!-- Active User Buttons -->
           <div
-            v-if="item.status === 'ACTIVE'"
+            v-if="item.status === 'ACTIVE' && item.id !== user?.id"
             class="flex flex-col md:flex-row gap-2"
           >
             <UPopover
@@ -234,6 +237,7 @@ const goCreateUser = () => {
             class="flex flex-col md:flex-row gap-2"
           >
             <UButton
+              v-if="item.id !== user?.id"
               type="button"
               color="primary"
               variant="solid"
@@ -247,6 +251,7 @@ const goCreateUser = () => {
               :ui="{ content: 'border border-brand' }"
             >
               <UButton
+                v-if="item.id !== user?.id"
                 color="error"
                 variant="solid"
                 class="w-full md:w-36 justify-center"
