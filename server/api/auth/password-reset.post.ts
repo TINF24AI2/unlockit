@@ -32,11 +32,14 @@ export default defineEventHandler(async (event) => {
 
   const user = users[0]!
 
+  if (user.password == null) {
+    badCred()
+  }
   if (await verifyPassword(user.password, oldPassword)) {
     const newHash = await hashPassword(newPassword)
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: newHash, needsPasswordReset: false }
+      data: { password: newHash }
     })
 
     // Logout user if logged in with old password

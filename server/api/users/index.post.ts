@@ -1,36 +1,28 @@
-import { createError, defineEventHandler, readBody, type H3Event } from 'h3'
 import { Permission } from '../../../generated/prisma/client'
 import { prisma } from '#server/utils/prisma'
-import { requireGoodPassword } from '#server/utils/auth'
+import z from 'zod'
+import { randomBytes } from 'node:crypto'
 
-interface UserPayload {
-  email: string
-  username?: string
-  password: string
-  admin?: boolean
-}
+const { sendMail } = useNodeMailer()
 
-export default defineEventHandler(async (event: H3Event) => {
-  const session = await requireUserSession(event)
-  const sessionUser = session.user as LoggedInUser
+const bodySchema = z.object({
+  email: z.string().email(),
+  username: z.string().optional(),
+  admin: z.boolean().optional()
+})
 
+export default defineEventHandler(async (event) => {
   await authorize(event, isAdmin)
 
+  const session = await requireUserSession(event)
+  const sessionUser = session.user as LoggedInUser
   const createdById = Number(sessionUser.id)
 
-  const body = await readBody<UserPayload>(event)
-
-  const email = body.email?.trim().toLowerCase()
-  const name = body.username?.trim()
-  const password = body.password
+  const { email, username: name, admin } = await readValidatedBody(event, bodySchema.parse)
 
   // Validate required fields
   if (!email) {
     throw createError({ statusCode: 400, statusMessage: 'email is required' })
-  }
-
-  if (!password) {
-    throw createError({ statusCode: 400, statusMessage: 'password is required' })
   }
 
   // Check if email has a valid format
@@ -48,22 +40,24 @@ export default defineEventHandler(async (event: H3Event) => {
     throw createError({ statusCode: 409, statusMessage: 'Email is already in use' })
   }
 
-  // Check password complexity (length and character requirements from frontend)
-  requireGoodPassword(password)
-
-  // Hash the password before storing it in the database
-  const hashedPassword = await hashPassword(password)
-
   // Derivate permissions from frontend boolean checkbox
-  const permissions: Permission[] = body.admin === true ? [Permission.ADMIN] : []
+  const permissions: Permission[] = admin === true ? [Permission.ADMIN] : []
+
+  const token = randomBytes(32).toString('hex')
 
   const user = await prisma.user.create({
     data: {
       email,
       name,
-      password: hashedPassword,
+      password: null,
       permissions,
-      createdById
+      createdById,
+      passwordTokens: {
+        create: {
+          token: token,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // Token expires in 24 hours
+        }
+      }
     },
     select: {
       id: true,
@@ -72,6 +66,31 @@ export default defineEventHandler(async (event: H3Event) => {
       permissions: true
     }
   })
+
+  try {
+    await sendMail({
+      to: email,
+      subject: 'You have been invited to Unlockit',
+      html: `
+        <p>Hallo${name ? ` ${name}` : ''},</p>
+        <p>Sie wurden eingeladen, sich bei Unlockit anzumelden. Bitte klicken Sie auf den unten stehenden Link, um Ihr Passwort festzulegen und Ihren Account zu aktivieren:</p>
+        <a href="${getRequestURL(event).origin}/set-password?token=${token}">Passwort festlegen</a>
+        <p>Dieser Link läuft in 24 Stunden ab. Danach können Sie die Funktion zum Zurücksetzen des Passworts mit dieser E-Mail-Adresse verwenden, um einen neuen Link zu generieren.</p>
+        <p>Wenn Sie diese Einladung nicht erwartet haben, ignorieren Sie bitte diese E-Mail.</p>
+        <br>
+        <p>Viele Grüße,<br>Ihr SE-SSP Team</p>
+      `,
+      text: `Hallo${name ? ` ${name}` : ''},\n\nSie wurden eingeladen, sich bei Unlockit anzumelden. Bitte verwenden Sie den unten stehenden Link, um Ihr Passwort festzulegen und Ihren Account zu aktivieren:\n\n${getRequestURL(event).origin}/set-password?token=${token}\n\nDieser Link läuft in 24 Stunden ab. Danach können Sie die Funktion zum Zurücksetzen des Passworts mit dieser E-Mail-Adresse verwenden, um einen neuen Link zu generieren.\n\nWenn Sie diese Einladung nicht erwartet haben, ignorieren Sie bitte diese E-Mail.\n\nViele Grüße,\nIhr SE-SSP Team`
+    })
+  } catch (error) {
+    console.error(error)
+
+    // If sending the email fails, delete the created user to prevent orphaned records and security issues with unused tokens
+    await prisma.user.delete({
+      where: { id: user.id }
+    })
+    throw createError({ statusCode: 500, statusMessage: 'Failed to send invitation email' })
+  }
 
   return {
     success: true,

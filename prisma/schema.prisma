@@ -47,15 +47,15 @@ enum ProductStatus {
 }
 
 model Product {
-  id          String       @id
+  id          String        @id
   productName String
   description String?
   vendor      String?
   status      ProductStatus @default(ACTIVE)
   createdById Int
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdBy   User          @relation(fields: [createdById], references: [id])
   licenseKeys LicenseKey[]
 
   @@index([createdById])
@@ -118,13 +118,12 @@ model AssignmentHistory {
 }
 
 model User {
-  id                 Int          @id @default(autoincrement())
-  email              String       @unique
-  name               String?
-  password           String
-  needsPasswordReset Boolean      @default(true)
-  permissions        Permission[] @default([])
-  status             UserStatus   @default(ACTIVE)
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String?
+  password    String?
+  permissions Permission[] @default([])
+  status      UserStatus   @default(INVITED)
 
   createdBy   User?    @relation("UserCreatedBy", fields: [createdById], references: [id])
   createdById Int?
@@ -135,10 +134,23 @@ model User {
   processedLicenseAssignmentsHistory AssignmentHistory[]
   licenseAssignments                 LicenseAssignment[] @relation("LicenseAssignmentUser")
   licenseKeys                        LicenseKey[]
+  passwordTokens                     PasswordTokens[]
   products                           Product[]
 
   @@index([createdById])
   @@index([email])
+}
+
+model PasswordTokens {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 enum Permission {
@@ -146,6 +158,7 @@ enum Permission {
 }
 
 enum UserStatus {
+  INVITED
   ACTIVE
   DEACTIVATED
   DELETED
