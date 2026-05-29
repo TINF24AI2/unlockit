@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { FetchError } from 'ofetch'
 import type { LicenseListing } from '../../../server/services/licenses'
 
 // licence types
@@ -47,6 +48,7 @@ const statusFilter = ref<LicenseStatus | null>(null)
 const productFilter = ref<string | null>(null)
 const deactivationReasons = ref<Record<string, string>>({})
 const productDeactivationReasons = ref<Record<string, string>>({})
+const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
 const { data: productsResponse, refresh: refreshProducts } = await useFetch<ProductsResponse>('/api/products')
 
@@ -185,8 +187,19 @@ const changeProduct = async (productId: string, change: 'deactivate' | 'reactiva
     })
     await Promise.all([refreshLicenses(), refreshProducts()])
     productDeactivationReasons.value[productId] = ''
+    notification.value = {
+      message: 'Die Aktion wurde erfolgreich ausgeführt.',
+      type: 'success'
+    }
   } catch (error) {
-    alert(`Fehler bei Produkt-Aktion ${error}`)
+    let errorMessage = 'Ein unbekannter Fehler ist aufgetreten.'
+    if (error instanceof FetchError && error.data?.statusMessage) {
+      errorMessage = error.data.statusMessage
+    }
+    notification.value = {
+      message: `Die Aktion konnte nicht ausgeführt werden: ${errorMessage}`,
+      type: 'failure'
+    }
   }
 }
 
@@ -263,6 +276,14 @@ const canReactivateLicense = (item: DisplayLicense) => {
       >
         Lizenz-Verwaltung
       </h2>
+
+      <NotificationContainer
+        v-if="notification"
+        class="mb-4"
+        :message="notification.message"
+        :type="notification.type"
+        @close="notification = null"
+      />
 
       <div class="flex items-center gap-4">
         <USelect
