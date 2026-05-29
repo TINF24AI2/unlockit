@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { LicenseListing } from '../../../server/services/licenses'
 
 // licence types
@@ -78,6 +78,12 @@ const productOptions = computed(() => {
     ...products.map(p => ({ label: p.productName, value: p.id }))
   ]
 })
+
+watch([productOptions, productFilter], ([options, selectedProductId]) => {
+  if (selectedProductId && !options.some(option => option.value === selectedProductId)) {
+    productFilter.value = null
+  }
+}, { immediate: true })
 
 // keep all products in the lookup so we can derive the current product state once.
 const productMap = computed(() => {

@@ -39,7 +39,7 @@ type AssignmentHistory = {
 const search = ref('')
 const productFilter = ref<string | null>(null)
 
-const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string }[] }>('/api/products')
+const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string, status: string }[] }>('/api/products')
 
 const { data: historyResponse } = await useFetch<AssignmentHistory[]>('/api/audit/assignments', {
   method: 'GET'
@@ -47,7 +47,7 @@ const { data: historyResponse } = await useFetch<AssignmentHistory[]>('/api/audi
 
 // Generating the product filter options for the dropdown
 const productOptions = computed(() => {
-  const products = productsResponse.value?.data || []
+  const products = (productsResponse.value?.data || []).filter(product => product.status !== 'DELETED')
   return [
     { label: 'Alle Produkte', value: null },
     ...products.map(p => ({ label: p.productName, value: p.id }))
