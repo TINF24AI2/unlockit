@@ -13,6 +13,7 @@ const statusLabels: Record<LicenseStatus, string> = {
 
 type LicenseStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED' | 'EXHAUSTED'
 type ProductStatus = 'ACTIVE' | 'DEACTIVATED' | 'DELETED'
+type StatusFilter = LicenseStatus | 'PRODUCT_ACTIVE' | 'PRODUCT_INACTIVE' | null
 
 type ProductListItem = {
   id: string
@@ -44,7 +45,7 @@ definePageMeta({
 })
 
 const search = ref('')
-const statusFilter = ref<LicenseStatus | null>(null)
+const statusFilter = ref<StatusFilter>(null)
 const productFilter = ref<string | null>(null)
 const deactivationReasons = ref<Record<string, string>>({})
 const productDeactivationReasons = ref<Record<string, string>>({})
@@ -55,7 +56,12 @@ const { data: productsResponse, refresh: refreshProducts } = await useFetch<Prod
 // fetch all licenses includig deactivated ones
 const queryParams = computed(() => {
   const params: { view: string, status?: LicenseStatus, productId?: string } = { view: 'admin' } // need to specify admin view show get deactivated licenses
-  if (statusFilter.value) {
+  if (
+    statusFilter.value === 'ACTIVE'
+    || statusFilter.value === 'INACTIVE'
+    || statusFilter.value === 'EXPIRED'
+    || statusFilter.value === 'EXHAUSTED'
+  ) {
     params.status = statusFilter.value
   }
   if (productFilter.value) {
@@ -108,8 +114,10 @@ const getProductStatusColor = (status: ProductStatus | null) => {
 // map for all existing status values
 const statusOptions = computed(() => [
   { label: 'Jeder Status', value: null },
-  { label: 'Lizenz aktiv', value: 'ACTIVE' },
-  { label: 'Lizenz inaktiv', value: 'INACTIVE' }
+  { label: 'Aktive Lizenzen', value: 'ACTIVE' },
+  { label: 'Inaktive Lizenzen', value: 'INACTIVE' },
+  { label: 'Aktivierte Produkte', value: 'PRODUCT_ACTIVE' },
+  { label: 'Deaktivierte Produkte', value: 'PRODUCT_INACTIVE' }
 ])
 
 // sort by product name
@@ -132,6 +140,28 @@ const filteredLicenses = computed(() => {
         })
   return filtered
     .filter(license => getProductStatus(license.product.id) !== 'DELETED')
+    .filter((license) => {
+      const productStatus = getProductStatus(license.product.id)
+
+      if (statusFilter.value === 'PRODUCT_ACTIVE') {
+        return productStatus === 'ACTIVE'
+      }
+
+      if (statusFilter.value === 'PRODUCT_INACTIVE') {
+        return productStatus === 'DEACTIVATED'
+      }
+
+      if (
+        statusFilter.value === 'ACTIVE'
+        || statusFilter.value === 'INACTIVE'
+        || statusFilter.value === 'EXPIRED'
+        || statusFilter.value === 'EXHAUSTED'
+      ) {
+        return license.status === statusFilter.value
+      }
+
+      return true
+    })
     .sort(sortByProductName)
     .map(license => ({
       ...license,
