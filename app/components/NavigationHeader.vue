@@ -18,9 +18,9 @@ const home = computed(() => isAdmin.value ? '/admin/homepage' : '/user/homepage'
 
 const adminItems = computed<NavigationMenuItem[]>(() => [
   {
-    label: 'Produkte/ Lizenzen hinzufügen',
-    to: '/admin/add_product',
-    active: route.path.startsWith('/admin/add_product')
+    label: 'Produkte/ Lizenzen verwalten',
+    to: '/admin/licenselist',
+    active: route.path.startsWith('/admin/licenselist')
   },
   {
     label: 'Lizenzanfragen',
