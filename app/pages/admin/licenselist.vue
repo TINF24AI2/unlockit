@@ -123,6 +123,7 @@ const filteredLicenses = computed(() => {
           return name.includes(query) || productName.includes(query) || key.includes(query)
         })
   return filtered
+    .filter(license => getProductStatus(license.product.id) !== 'DELETED')
     .sort(sortByProductName)
     .map(license => ({
       ...license,
