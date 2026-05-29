@@ -20,6 +20,12 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-15',
 
+  nitro: {
+    externals: {
+      external: ['pdfmake']
+    }
+  },
+
   eslint: {
     config: {
       stylistic: {

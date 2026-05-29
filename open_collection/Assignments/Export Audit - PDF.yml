@@ -1,0 +1,28 @@
+info:
+  name: Export Audit - PDF
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{host}}/api/audit/export"
+  params:
+    - name: format
+      value: pdf
+      type: query
+      disabled: false
+    - name: startDate
+      value: ""
+      type: query
+      disabled: true
+    - name: endDate
+      value: ""
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
