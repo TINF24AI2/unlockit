@@ -75,6 +75,10 @@ export async function generatePDF(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pdfmake = _require('pdfmake') as any
 
+  const robotoPkgDir = path.dirname(_require.resolve('roboto-font/package.json'))
+  pdfmake.setUrlAccessPolicy(() => false)
+  pdfmake.setLocalAccessPolicy((filePath: string) => filePath.startsWith(robotoPkgDir))
+
   pdfmake.addFonts({
     Roboto: {
       normal: _require.resolve('roboto-font/fonts/Roboto/roboto-regular-webfont.ttf'),
