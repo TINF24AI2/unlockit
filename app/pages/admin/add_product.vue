@@ -107,6 +107,16 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
       throw new Error('Kein Produkt ausgewählt oder erstellt.')
     }
 
+    // check if selected product is deactivated
+    const selectedProduct = existingProducts.value?.data?.find(product => product.id === productId)
+    if (selectedProduct?.status === 'DEACTIVATED') {
+      notification.value = {
+        message: 'Dieses Produkt ist deaktiviert. Bitte aktivieren Sie es zuerst, bevor Sie Lizenzen hinzufügen.',
+        type: 'failure'
+      }
+      return
+    }
+
     const licensePromises = [
       ...data.volumeLicenceCodes.map(licence => $fetch('/api/license-keys', {
         method: 'POST',
