@@ -39,17 +39,15 @@ const state = reactive({
 const isSubmitting = ref(false)
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
-const { data: existingProducts, refresh: refreshProducts } = await useFetch('/api/products', {
-  method: 'GET',
-  default: () => [],
-  transform: (response: { data: { id: string, productName: string }[] }) => {
-    return response.data.map(p => ({ label: p.productName, value: p.id }))
-  }
+const { data: existingProducts, refresh: refreshProducts } = await useFetch<{ data: { id: string, productName: string, status: string }[] }>('/api/products', {
+  method: 'GET'
 })
 
 const productOptions = computed(() => [
   { label: '-- Neues Produkt erstellen --', value: null },
-  ...(existingProducts.value || [])
+  ...((existingProducts.value?.data || [])
+    .filter(product => product.status !== 'DELETED')
+    .map(product => ({ label: product.productName, value: product.id })))
 ])
 
 watch(() => state.numberOfVolumeLicences, (newCount) => {
@@ -146,7 +144,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
 }
 
 const goBack = () => {
-  navigateTo('/admin/licencelist')
+  navigateTo('/admin/licenselist')
 }
 </script>
 
