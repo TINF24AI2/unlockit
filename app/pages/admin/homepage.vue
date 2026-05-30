@@ -28,7 +28,7 @@ const goHistory = () => {
 }
 
 const goAudit = () => {
-  navigateTo('/admin/audit')
+  navigateTo('/user/audit')
 }
 
 type LicenseAssignment = {
