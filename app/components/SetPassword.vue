@@ -23,6 +23,7 @@ const schema = z.object({
     .regex(/[a-z]/, 'Mindestens ein Kleinbuchstabe erforderlich.')
     .regex(/[A-Z]/, 'Mindestens ein Großbuchstabe erforderlich.')
     .regex(/\d/, 'Mindestens eine Zahl erforderlich.')
+    .regex(/^[A-Za-z0-9!#$%&]+$/, 'Passwort enthält ein unzulässiges Sonderzeichen')
     .regex(/[!#$%&]/, 'Mindestens ein Sonderzeichen erforderlich. Erlaubte Sonderzeichen: !#$%&'),
   confirmPassword: z.string('Passwort wiederholen').min(1, 'Passwort wiederholen')
 })

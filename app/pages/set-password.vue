@@ -3,6 +3,7 @@ import SetPassword from '~/components/SetPassword.vue'
 
 const { clear } = useUserSession()
 const route = useRoute()
+const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
 await clear()
 
@@ -10,10 +11,15 @@ async function submit(data: {
   password: string
   confirmPassword: string
 }) {
+  notification.value = null
+
   const token = route.query.token
 
   if (typeof token !== 'string' || token.length === 0) {
-    alert('Ungültiger oder fehlender Token')
+    notification.value = {
+      message: 'Ungültiger oder fehlender Token',
+      type: 'failure'
+    }
     return
   }
 
@@ -38,11 +44,24 @@ async function submit(data: {
       message = err.data?.statusMessage || err.data?.message || message
     }
 
-    alert(message)
+    notification.value = {
+      message,
+      type: 'failure'
+    }
   }
 }
 </script>
 
 <template>
-  <SetPassword @submit="submit" />
+  <div class="grid gap-4">
+    <NotificationContainer
+      v-if="notification"
+      class="mt-10 w-1/2 mx-auto"
+      :message="notification.message"
+      :type="notification.type"
+      @close="notification = null"
+    />
+
+    <SetPassword @submit="submit" />
+  </div>
 </template>
