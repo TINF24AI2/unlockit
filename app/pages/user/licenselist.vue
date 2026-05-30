@@ -19,7 +19,7 @@ const search = ref('')
 const productFilter = ref<string | null>(null)
 const onlyAvailableFilter = ref(false)
 
-const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string }[] }>('/api/products')
+const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string, status: string }[] }>('/api/products')
 
 const { data: licenseResponse } = await useFetch<{ success: boolean, data: UserLicense[] }>('/api/license-keys', {
   method: 'GET'
@@ -27,7 +27,7 @@ const { data: licenseResponse } = await useFetch<{ success: boolean, data: UserL
 
 // Generating the product filter options for the dropdown
 const productOptions = computed(() => {
-  const products = productsResponse.value?.data || []
+  const products = (productsResponse.value?.data || []).filter(product => product.status !== 'DELETED')
   return [
     { label: 'Alle Produkte', value: null },
     ...products.map(p => ({ label: p.productName, value: p.id }))
@@ -40,6 +40,7 @@ const filteredLicenses = computed(() => {
   const query = search.value.toLowerCase()
 
   return licenses
+    .filter(license => license.product?.id && productsResponse.value?.data?.some(product => product.id === license.product.id && product.status !== 'DELETED'))
     .filter((license) => {
       const name = (license.licenseName || '').toLowerCase()
       const productName = (license.product.productName || '').toLowerCase()
