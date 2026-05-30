@@ -39,20 +39,6 @@ const adminItems = computed<NavigationMenuItem[]>(() => [
   }
 ])
 
-const accountItems = [
-  {
-    label: 'Passwort ändern',
-    to: '/set_password',
-    active: route.path.startsWith('/set_password')
-  },
-  {
-    label: 'Logout',
-    onSelect: async () => {
-      await logout()
-    }
-  }
-]
-
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Lizenz beantragen',
@@ -81,13 +67,12 @@ const items = computed<NavigationMenuItem[]>(() => [
             variant="subtle"
           />
         </UTooltip>
-        <UDropdownMenu :items="accountItems">
-          <UButton
-            label="Account"
-            trailing-icon="i-lucide-chevron-down"
-            variant="subtle"
-          />
-        </UDropdownMenu>
+        <UButton
+          label="Logout"
+          icon="i-lucide-log-out"
+          variant="subtle"
+          @click="logout"
+        />
       </div>
     </template>
   </UHeader>
