@@ -71,6 +71,7 @@ const toggleAdmin = async (id: number) => {
 const getStatusLabel = (status: string) => {
   switch (status) {
     case 'ACTIVE': return 'Aktiv'
+    case 'INVITED': return 'Eingeladen'
     case 'DEACTIVATED': return 'Deaktiviert'
     case 'DELETED': return 'Gelöscht'
     default: return status

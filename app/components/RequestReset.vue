@@ -8,24 +8,18 @@ const fields = ref<AuthFormField[]>([
     type: 'text',
     label: 'Email',
     required: true
-  },
-  {
-    name: 'password',
-    type: 'password',
-    label: 'Passwort',
-    required: true
   }
 ])
 
 const schema = z.object({
-  // change to z.email('Ungültige Email-Adresse') later
-  email: z.string().min(1, 'Nutzername ist erforderlich'),
-  password: z.string('Passwort ist erforderlich')
+  email: z.string().email('Ungültige Email-Adresse')
 })
 
 type Schema = z.output<typeof schema>
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits<{
+  submit: [data: Schema]
+}>()
 
 function onSubmit(payload: FormSubmitEvent<Schema>) {
   emit('submit', payload.data)
@@ -37,10 +31,10 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md bg-gray-400">
       <UAuthForm
         :schema="schema"
-        title="Login"
+        title="Passwort zurücksetzen"
         :fields="fields"
         :submit="{
-          label: 'Anmelden',
+          label: 'Link senden',
           color: 'neutral'
         }"
         class="max-w-md"

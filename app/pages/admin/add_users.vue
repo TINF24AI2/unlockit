@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue' // for automatically generating a password on page load
+import { ref } from 'vue'
 import * as z from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 
@@ -10,7 +10,6 @@ definePageMeta({
 const schema = z.object({
   email: z.email('Ungültige E-Mail Adresse'),
   username: z.string().min(1, { message: 'Benutzername ist erforderlich' }),
-  password: z.string().min(12, { message: 'Passwort muss mindestens 12 Zeichen lang sein' }),
   admin: z.boolean()
 })
 type Schema = z.output<typeof schema>
@@ -18,30 +17,11 @@ type Schema = z.output<typeof schema>
 const state = ref({
   email: '',
   username: '',
-  password: '',
   admin: false
 })
 
 const isSubmitting = ref(false)
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
-
-// generating the password
-function generatePassword(length = 12) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&'
-  let out = ''
-  for (let i = 0; i < length; i++) {
-    out += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return out
-}
-
-function generateNewPassword() {
-  state.value.password = generatePassword()
-}
-
-onMounted(() => {
-  generateNewPassword()
-})
 
 // submit
 const submit = async (event: FormSubmitEvent<Schema>) => {
@@ -57,7 +37,7 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
     })
 
     notification.value = {
-      message: `Der User für die E-Mail ${event.data.email} wurde erfolgreich hinzugefügt.`,
+      message: `Der User für die E-Mail ${event.data.email} wurde erfolgreich eingeladen.`,
       type: 'success'
     }
 
@@ -65,10 +45,8 @@ const submit = async (event: FormSubmitEvent<Schema>) => {
     state.value = {
       email: '',
       username: '',
-      password: '',
       admin: false
     }
-    generateNewPassword()
   } catch (error: unknown) {
     let message = 'User konnte nicht erstellt werden.'
 
@@ -133,25 +111,6 @@ const goBack = () => {
           v-model="state.username"
           class="w-full"
         />
-      </UFormField>
-
-      <UFormField
-        label="Generiertes Passwort"
-        name="password"
-      >
-        <div class="flex items-center gap-2">
-          <UInput
-            v-model="state.password"
-            class="flex-1"
-            readonly
-          />
-          <UButton
-            color="neutral"
-            @click.prevent="generateNewPassword"
-          >
-            Neu
-          </UButton>
-        </div>
       </UFormField>
 
       <UFormField name="admin">
