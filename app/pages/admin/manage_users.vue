@@ -117,6 +117,11 @@ const deactivateUser = (id: number) => updateUserStatus(id, 'DEACTIVATED')
 const reactivateUser = (id: number) => updateUserStatus(id, 'ACTIVE')
 const deleteUser = (id: number) => updateUserStatus(id, 'DELETED')
 
+const canToggleAdmin = (status: string) => status === 'ACTIVE'
+const canDeactivateUser = (status: string) => status === 'ACTIVE'
+const canReactivateOrDeleteUser = (status: string) => status === 'DEACTIVATED'
+const canDeleteInvitedUser = (status: string) => status === 'INVITED'
+
 // Navigation
 const goCreateUser = () => {
   navigateTo('/admin/add_users')
@@ -182,7 +187,7 @@ const goCreateUser = () => {
         <div class="flex flex-col md:flex-row gap-2 md:items-center">
           <!-- Common Button -->
           <UButton
-            v-if="item.id !== user?.id"
+            v-if="item.id !== user?.id && canToggleAdmin(item.status)"
             type="button"
             color="primary"
             variant="solid"
@@ -194,7 +199,7 @@ const goCreateUser = () => {
 
           <!-- Active User Buttons -->
           <div
-            v-if="item.status === 'ACTIVE' && item.id !== user?.id"
+            v-if="canDeactivateUser(item.status) && item.id !== user?.id"
             class="flex flex-col md:flex-row gap-2"
           >
             <UPopover
@@ -234,7 +239,7 @@ const goCreateUser = () => {
 
           <!-- Deactivated User Buttons -->
           <div
-            v-if="item.status === 'DEACTIVATED'"
+            v-if="canReactivateOrDeleteUser(item.status)"
             class="flex flex-col md:flex-row gap-2"
           >
             <UButton
@@ -263,6 +268,47 @@ const goCreateUser = () => {
                 <div class="p-4">
                   <p class="text-sm mb-2">
                     Möchten Sie den Nutzer wirklich löschen?
+                  </p>
+                  <div class="flex justify-end gap-2">
+                    <UButton
+                      variant="ghost"
+                      @click="close"
+                    >
+                      Abbrechen
+                    </UButton>
+                    <UButton
+                      color="error"
+                      @click="deleteUser(item.id)"
+                    >
+                      Bestätigen
+                    </UButton>
+                  </div>
+                </div>
+              </template>
+            </UPopover>
+          </div>
+
+          <!-- Invited User Buttons -->
+          <div
+            v-if="canDeleteInvitedUser(item.status)"
+            class="flex flex-col md:flex-row gap-2"
+          >
+            <UPopover
+              :key="`popover-delete-invited-${item.id}`"
+              :ui="{ content: 'border border-brand' }"
+            >
+              <UButton
+                v-if="item.id !== user?.id"
+                color="error"
+                variant="solid"
+                class="w-full md:w-36 justify-center"
+              >
+                Löschen
+              </UButton>
+              <template #content="{ close }">
+                <div class="p-4">
+                  <p class="text-sm mb-2">
+                    Möchten Sie den eingeladenen Nutzer wirklich löschen?
                   </p>
                   <div class="flex justify-end gap-2">
                     <UButton
