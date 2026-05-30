@@ -46,7 +46,9 @@ const isAdmin = currentUser.permissions.includes('ADMIN')
 const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string, status: string }[] }>('/api/products')
 
 const { data: historyResponse } = await useFetch<AssignmentHistory[]>('/api/audit/assignments', {
-  method: 'GET'
+  query: {
+    role: isAdmin ? undefined : 'user'
+  }
 })
 
 // Generating the product filter options for the dropdown
@@ -58,19 +60,9 @@ const productOptions = computed(() => {
   ]
 })
 
-const userHistory = computed(() => {
-  const history = historyResponse.value || []
-
-  if (isAdmin) return history
-
-  return history.filter(item =>
-    String(item.licenseAssignment.user.id) === String(currentUser.id)
-  )
-})
-
 // Filter history based on search and product filter
 const filteredHistory = computed(() => {
-  const history = userHistory.value || []
+  const history = historyResponse.value || []
   const query = search.value.toLowerCase()
 
   return history.filter((item) => {
