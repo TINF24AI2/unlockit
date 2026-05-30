@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 
 definePageMeta({
-  middleware: ['is-admin']
+  middleware: ['authenticated']
 })
 
 // Define the type for the history data based on the API response
@@ -39,6 +39,10 @@ type AssignmentHistory = {
 const search = ref('')
 const productFilter = ref<string | null>(null)
 
+const { user } = useUserSession()
+const currentUser = user.value as LoggedInUser
+const isAdmin = currentUser.permissions.includes('ADMIN')
+
 const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string, status: string }[] }>('/api/products')
 
 const { data: historyResponse } = await useFetch<AssignmentHistory[]>('/api/audit/assignments', {
@@ -54,9 +58,19 @@ const productOptions = computed(() => {
   ]
 })
 
+const userHistory = computed(() => {
+  const history = historyResponse.value || []
+
+  if (isAdmin) return history
+
+  return history.filter(item =>
+    String(item.licenseAssignment.user.id) === String(currentUser.id)
+  )
+})
+
 // Filter history based on search and product filter
 const filteredHistory = computed(() => {
-  const history = historyResponse.value || []
+  const history = userHistory.value || []
   const query = search.value.toLowerCase()
 
   return history.filter((item) => {

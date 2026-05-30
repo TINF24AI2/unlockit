@@ -31,11 +31,6 @@ const adminItems = computed<NavigationMenuItem[]>(() => [
     label: 'Nutzer verwalten',
     to: '/admin/manage_users',
     active: route.path.startsWith('/admin/manage_users')
-  },
-  {
-    label: 'Reporting',
-    to: '/admin/audit',
-    active: route.path.startsWith('/admin/audit')
   }
 ])
 
@@ -44,6 +39,11 @@ const items = computed<NavigationMenuItem[]>(() => [
     label: 'Lizenz beantragen',
     to: '/user/licenselist',
     active: route.path.startsWith('/user/licenselist')
+  },
+  {
+    label: 'Reporting',
+    to: '/user/audit',
+    active: route.path.startsWith('/user/audit')
   },
 
   ...(isAdmin.value ? adminItems.value : [])
