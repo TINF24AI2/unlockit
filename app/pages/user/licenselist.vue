@@ -9,7 +9,9 @@ type UserLicense = {
   id: string
   licenseName: string
   licenseType: string
-  status: string
+  status?: string
+  currentUsages: number
+  maxUsages: number
   product: { id: string, productName: string }
   userAssignment?: { status: string | null } | null
   canRequest: boolean
@@ -58,9 +60,11 @@ const filteredLicenses = computed(() => {
 // Small status label for the badge.
 const getLicenseStatus = (l: UserLicense) => {
   const status = l.userAssignment?.status
+  const isExhausted = l.status === 'EXHAUSTED' || l.currentUsages >= l.maxUsages
 
   if (status === 'APPROVED') return 'Im Besitz'
   if (status === 'PENDING') return 'Antrag in Bearbeitung'
+  if (isExhausted) return 'Aufgebraucht'
   if (l.canRequest) return 'Verfügbar'
   return 'Fehler'
 }
@@ -68,9 +72,11 @@ const getLicenseStatus = (l: UserLicense) => {
 // Badge color follows the status
 const getStatusColor = (l: UserLicense) => {
   const status = l.userAssignment?.status
+  const isExhausted = l.status === 'EXHAUSTED' || l.currentUsages >= l.maxUsages
 
   if (status === 'APPROVED') return 'neutral'
   if (status === 'PENDING') return 'warning'
+  if (isExhausted) return 'warning'
   if (l.canRequest) return 'primary'
   return 'error'
 }
