@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 
 definePageMeta({
-  middleware: ['is-admin']
+  middleware: ['authenticated']
 })
 
 // Define the type for the history data based on the API response
@@ -39,10 +39,16 @@ type AssignmentHistory = {
 const search = ref('')
 const productFilter = ref<string | null>(null)
 
+const { user } = useUserSession()
+const currentUser = user.value as LoggedInUser
+const isAdmin = currentUser.permissions.includes('ADMIN')
+
 const { data: productsResponse } = await useFetch<{ data: { id: string, productName: string, status: string }[] }>('/api/products')
 
 const { data: historyResponse } = await useFetch<AssignmentHistory[]>('/api/audit/assignments', {
-  method: 'GET'
+  query: {
+    role: isAdmin ? undefined : 'user'
+  }
 })
 
 // Generating the product filter options for the dropdown

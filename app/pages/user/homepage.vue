@@ -11,6 +11,10 @@ const goHistory = () => {
 const goApply = () => {
   navigateTo('/user/licenselist')
 }
+
+const goAudit = () => {
+  navigateTo('/user/audit')
+}
 </script>
 
 <template>
@@ -37,6 +41,14 @@ const goApply = () => {
           @click="goApply"
         >
           Lizenz beantragen
+        </UButton>
+
+        <UButton
+          color="neutral"
+          class="justify-center"
+          @click="goAudit"
+        >
+          Historie aller Lizenz-Anfragen
         </UButton>
 
         <UButton
