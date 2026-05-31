@@ -43,9 +43,9 @@ const columns: TableColumn<LicenseAssignmentHistoryEntry>[] = [
     cell: ({ row }) => row.original.licenseKey.product.productName
   },
   {
-    id: 'vendor',
-    header: 'Anbieter',
-    cell: ({ row }) => row.original.licenseKey.product.vendor ?? '-'
+    id: 'licenseKey',
+    header: 'Lizenzschlüssel',
+    cell: ({ row }) => row.original.licenseKey?.licenseKey ?? '-'
   },
   {
     accessorKey: 'assignmentNote',
