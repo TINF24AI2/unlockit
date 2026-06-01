@@ -1,4 +1,5 @@
 import type { AssignmentStatus } from '~~/generated/prisma/enums'
+import type { Prisma } from '../../../../generated/prisma/client'
 
 export default defineEventHandler(async (event) => {
   await authorize(event, isAdmin)
@@ -64,7 +65,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await prisma.$transaction([
+  // Fetch license info to determine whether status needs to change when usages update
+  const license = await prisma.licenseKey.findUnique({
+    where: { id: assignment.licenseKeyId },
+    select: { id: true, currentUsages: true, maxUsages: true, status: true }
+  })
+
+  if (!license) {
+    throw createError({ statusCode: 404, statusMessage: 'License key not found' })
+  }
+
+  const operations: Prisma.PrismaPromise<unknown>[] = [
     prisma.licenseAssignment.update({
       where: { id },
       data: {
@@ -82,22 +93,73 @@ export default defineEventHandler(async (event) => {
           }
         }
       }
-    }),
-    // If the assignment is approved, update the license key's current usages
-    // If the assignment is revoked, decrease the current usages
-    ...(newStatus === 'APPROVED'
-      ? [prisma.licenseKey.update({
-          where: { id: assignment.licenseKeyId },
-          data: { currentUsages: { increment: 1 } }
-        })]
-      : newStatus === 'REVOKED'
-        ? [prisma.licenseKey.update({
-            where: { id: assignment.licenseKeyId },
-            data: { currentUsages: { decrement: 1 } }
-          })]
-        : [] // No additional updates needed for REJECTED status
+    })
+  ]
+
+  // If the assignment is approved, update the license key's current usages and check if exhausted
+  // If the assignment is revoked, decrease the current usages and set status back to active if it was exhausted before
+  if (newStatus === 'APPROVED') {
+    const newUsages = (license.currentUsages ?? 0) + 1
+    const willBeExhausted = license.maxUsages !== null && newUsages >= license.maxUsages
+    operations.push(
+      prisma.licenseKey.update({
+        where: { id: assignment.licenseKeyId },
+        data: {
+          currentUsages: { increment: 1 },
+          ...(willBeExhausted ? { status: 'EXHAUSTED' } : {})
+        }
+      })
     )
-  ])
+    // If this approval will exhaust the license, reject other pending assignments
+    if (willBeExhausted) {
+      const pendingAssignments = await prisma.licenseAssignment.findMany({
+        where: {
+          licenseKeyId: assignment.licenseKeyId,
+          status: 'PENDING',
+          NOT: { id }
+        },
+        select: { id: true }
+      })
+
+      for (const pa of pendingAssignments) {
+        operations.push(
+          prisma.licenseAssignment.update({
+            where: { id: pa.id },
+            data: {
+              status: 'REJECTED',
+              assignmentNote: 'Alle verfügbaren Lizenzen wurden bereits vergeben.',
+              history: {
+                create: {
+                  id: crypto.randomUUID(),
+                  oldStatus: 'PENDING',
+                  newStatus: 'REJECTED',
+                  changedBy: {
+                    connect: {
+                      id: Number(sessionUser.id)
+                    }
+                  }
+                }
+              }
+            }
+          })
+        )
+      }
+    }
+  } else if (newStatus === 'REVOKED') {
+    const newUsages = (license.currentUsages ?? 0) - 1
+    const restoreActive = license.status === 'EXHAUSTED' && license.maxUsages !== null && newUsages < license.maxUsages
+    operations.push(
+      prisma.licenseKey.update({
+        where: { id: assignment.licenseKeyId },
+        data: {
+          currentUsages: { decrement: 1 },
+          ...(restoreActive ? { status: 'ACTIVE' } : {})
+        }
+      })
+    )
+  }
+
+  await prisma.$transaction(operations)
 
   const { sendMail } = useNodeMailer()
 

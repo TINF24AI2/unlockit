@@ -495,6 +495,11 @@ export async function requestLicense(
       throw new Error('System user not found – cannot auto-approve assignment')
     }
 
+    // Determine if the license will be exhausted after increment
+    const willBeExhausted
+      = availableLicense.maxUsages !== null
+        && (availableLicense.currentUsages ?? 0) + 1 >= availableLicense.maxUsages
+
     await prisma.$transaction([
       prisma.licenseAssignment.update({
         where: { id: assignmentId },
@@ -514,7 +519,10 @@ export async function requestLicense(
       }),
       prisma.licenseKey.update({
         where: { id: availableLicense.id },
-        data: { currentUsages: { increment: 1 } }
+        data: {
+          currentUsages: { increment: 1 },
+          ...(willBeExhausted ? { status: LicenseStatus.EXHAUSTED } : {})
+        }
       })
     ])
 
