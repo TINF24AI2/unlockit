@@ -58,7 +58,7 @@ const { data, pending } = await useFetch<{
 
 <template>
   <Container>
-    <div class="relative mb-6">
+    <div class="relative mb-4 text-xl font-semibold">
       <h2 class="text-center mb-6 text-2xl">
         Nutzerhistorie
       </h2>
