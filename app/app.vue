@@ -25,7 +25,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp>
+  <UApp id="top">
     <NavigationHeader />
 
     <UMain>
@@ -37,16 +37,15 @@ useSeoMeta({
     <UFooter>
       <template #left>
         <p class="text-sm text-muted">
-          Built with Nuxt UI and love • © {{ new Date().getFullYear() }}
+          Built for SWE - Group Project © {{ new Date().getFullYear() }}
         </p>
       </template>
 
       <template #right>
         <UButton
-          to="https://github.com/nuxt-ui-templates/starter"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
+          to="#top"
+          label="Zurück nach oben"
+          icon="i-heroicons-arrow-up-20-solid"
           color="neutral"
           variant="ghost"
         />
