@@ -132,9 +132,8 @@ const formatDate = (dateString: string) => {
       </div>
     </div>
 
-    <!-- Scrollbar -->
     <div
-      class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto"
+      class="bg-white rounded-3xl p-4 space-y-3"
     >
       <div
         v-if="filteredAssignments.length === 0"

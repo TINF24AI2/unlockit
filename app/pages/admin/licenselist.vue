@@ -341,9 +341,8 @@ const canReactivateLicense = (item: DisplayLicense) => {
       </div>
     </div>
 
-    <!-- Scrollbar -->
     <div
-      class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto"
+      class="bg-white rounded-3xl p-4 space-y-3"
     >
       <div
         v-for="item in filteredLicenses"

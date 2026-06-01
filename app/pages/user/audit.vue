@@ -112,9 +112,9 @@ const getStatusColor = (status: string) => {
 
 <template>
   <Container class="p-6 relative pb-20">
-    <div class="text-center">
+    <div class="grid mb-6 gap-2">
       <h2
-        class="mb-4 text-xl font-semibold"
+        class="mb-4 text-xl font-semibold text-center"
       >
         Historie der Lizenzanfragen
       </h2>
@@ -138,7 +138,7 @@ const getStatusColor = (status: string) => {
     </div>
 
     <div
-      class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto"
+      class="bg-white rounded-3xl p-4 space-y-3"
     >
       <div
         v-if="filteredHistory.length === 0"

@@ -103,10 +103,9 @@ const requestLicense = (license: UserLicense) => {
 
 <template>
   <Container class="p-6 relative pb-20">
-    <div class="text-center">
+    <div class="grid mb-6 gap-2">
       <h2
-        class="mb-4 text-xl font-semibold"
-        align="center"
+        class="mb-4 text-xl font-semibold text-center"
       >
         Produkte & verfügbare Lizenzen
       </h2>
@@ -134,7 +133,7 @@ const requestLicense = (license: UserLicense) => {
     </div>
 
     <div
-      class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto"
+      class="bg-white rounded-3xl p-4 space-y-3"
     >
       <!-- If searchbar deons't match anything -->
       <div
