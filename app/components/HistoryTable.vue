@@ -103,7 +103,7 @@ const getStatusColor = (status: string) => {
       </template>
 
       <template #assignmentNote-cell="{ row }">
-        <div class="max-w-xs break-all">
+        <div class="max-w-xs">
           {{ row.original.assignmentNote ?? '-' }}
         </div>
       </template>
