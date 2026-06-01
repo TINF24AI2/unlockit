@@ -168,7 +168,6 @@ const formatDate = (dateString: string) => {
         <div class="grid grid-cols-2 gap-2">
           <UPopover
             :key="`popover-accept-${item.id}`"
-            :ui="{ content: 'border border-brand' }"
           >
             <UButton
               type="button"
@@ -203,7 +202,6 @@ const formatDate = (dateString: string) => {
 
           <UPopover
             :key="`popover-reject-${item.id}`"
-            :ui="{ content: 'border border-brand' }"
           >
             <UButton
               type="button"

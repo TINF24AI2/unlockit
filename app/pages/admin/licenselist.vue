@@ -384,7 +384,6 @@ const canReactivateLicense = (item: DisplayLicense) => {
             v-if="item.status === 'ACTIVE'"
             :key="`popover-${item.id}`"
             :popper="{ placement: 'top-end' }"
-            :ui="{ content: 'border border-brand' }"
           >
             <UButton
               color="warning"
@@ -432,7 +431,6 @@ const canReactivateLicense = (item: DisplayLicense) => {
             <UPopover
               v-if="item.productStatus === 'ACTIVE'"
               :popper="{ placement: 'top-end' }"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 color="error"
@@ -476,7 +474,6 @@ const canReactivateLicense = (item: DisplayLicense) => {
               </UButton>
               <UPopover
                 :popper="{ placement: 'top-end' }"
-                :ui="{ content: 'border border-brand' }"
               >
                 <UButton
                   type="button"

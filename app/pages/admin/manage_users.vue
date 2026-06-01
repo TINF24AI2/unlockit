@@ -203,7 +203,6 @@ const goCreateUser = () => {
           >
             <UPopover
               :key="`popover-deactivate-${item.id}`"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 color="error"
@@ -253,7 +252,6 @@ const goCreateUser = () => {
             </UButton>
             <UPopover
               :key="`popover-delete-${item.id}`"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 v-if="item.id !== user?.id"
@@ -294,7 +292,6 @@ const goCreateUser = () => {
           >
             <UPopover
               :key="`popover-delete-invited-${item.id}`"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 v-if="item.id !== user?.id"

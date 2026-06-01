@@ -102,9 +102,9 @@ const formatDate = (dateString: string) => {
 
     <!-- Options menu -->
     <div class="grid grid-cols-[1fr_3fr] gap-20 items-start">
-      <Container class="grid gap-4 w-full h-fit p-6 !bg-[var(--color-brand)]">
+      <Container class="grid gap-4 w-full h-fit p-6">
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goManageProducts"
         >
@@ -112,7 +112,7 @@ const formatDate = (dateString: string) => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goManageAssignments"
         >
@@ -120,7 +120,7 @@ const formatDate = (dateString: string) => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goApply"
         >
@@ -128,7 +128,7 @@ const formatDate = (dateString: string) => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goManageUsers"
         >
@@ -136,7 +136,7 @@ const formatDate = (dateString: string) => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goAudit"
         >
@@ -144,7 +144,7 @@ const formatDate = (dateString: string) => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goHistory"
         >
@@ -200,7 +200,6 @@ const formatDate = (dateString: string) => {
               <div class="flex w-full justify-center">
                 <UPopover
                   :key="`popover-accept-${item.id}`"
-                  :ui="{ content: 'border border-brand' }"
                   class="inline-flex"
                 >
                   <UButton
@@ -237,7 +236,6 @@ const formatDate = (dateString: string) => {
               <div class="flex w-full justify-center">
                 <UPopover
                   :key="`popover-reject-${item.id}`"
-                  :ui="{ content: 'border border-brand' }"
                   class="inline-flex"
                 >
                   <UButton
