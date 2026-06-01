@@ -102,6 +102,12 @@ const getStatusColor = (status: string) => {
         </div>
       </template>
 
+      <template #assignmentNote-cell="{ row }">
+        <div class="max-w-xs break-all">
+          {{ row.original.assignmentNote ?? '-' }}
+        </div>
+      </template>
+
       <template #empty>
         <div class="py-6 text-center text-gray-500">
           Keine Daten vorhanden
