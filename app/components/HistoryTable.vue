@@ -43,9 +43,9 @@ const columns: TableColumn<LicenseAssignmentHistoryEntry>[] = [
     cell: ({ row }) => row.original.licenseKey.product.productName
   },
   {
-    id: 'vendor',
-    header: 'Anbieter',
-    cell: ({ row }) => row.original.licenseKey.product.vendor ?? '-'
+    id: 'licenseKey',
+    header: 'Lizenzschlüssel',
+    cell: ({ row }) => row.original.licenseKey?.licenseKey ?? '-'
   },
   {
     accessorKey: 'assignmentNote',
@@ -82,7 +82,7 @@ const getStatusColor = (status: string) => {
       :columns="columns"
       :loading="loading"
       :ui="{
-        td: 'text-gray-500 py-4',
+        td: 'text-gray-500 py-4 whitespace-normal break-words',
         th: 'text-black-700 font-semibold'
       }"
     >
@@ -94,6 +94,18 @@ const getStatusColor = (status: string) => {
         >
           {{ getStatusLabel(row.original.status) }}
         </UBadge>
+      </template>
+
+      <template #licenseKey-cell="{ row }">
+        <div class="max-w-xs break-all">
+          {{ row.original.licenseKey?.licenseKey ?? '-' }}
+        </div>
+      </template>
+
+      <template #assignmentNote-cell="{ row }">
+        <div class="max-w-xs">
+          {{ row.original.assignmentNote ?? '-' }}
+        </div>
       </template>
 
       <template #empty>
