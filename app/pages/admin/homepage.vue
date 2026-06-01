@@ -150,12 +150,6 @@ const formatDate = (dateString: string) => {
         >
           Persönliche Historie
         </UButton>
-        <UButton
-          color="neutral"
-          class="justify-center"
-        >
-          Accountpasswort ändern
-        </UButton>
       </Container>
 
       <!-- Preview panel -->

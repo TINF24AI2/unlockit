@@ -50,13 +50,6 @@ const goAudit = () => {
         >
           Historie aller Lizenz-Anfragen
         </UButton>
-
-        <UButton
-          color="neutral"
-          class="justify-center"
-        >
-          Accountpasswort ändern
-        </UButton>
       </Container>
     </div>
   </div>
