@@ -26,7 +26,7 @@ const goAudit = () => {
 
     <!-- Options menu -->
     <div class="flex justify-center">
-      <Container class="grid gap-4 h-fit p-6 !bg-[var(--color-brand)]">
+      <Container class="grid gap-4 h-fit p-6">
         <UButton
           color="neutral"
           class="justify-center"
