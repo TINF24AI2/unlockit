@@ -28,7 +28,7 @@ const goAudit = () => {
     <div class="flex justify-center">
       <Container class="grid gap-4 h-fit p-6">
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goHistory"
         >
@@ -36,7 +36,7 @@ const goAudit = () => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goApply"
         >
@@ -44,7 +44,7 @@ const goAudit = () => {
         </UButton>
 
         <UButton
-          color="neutral"
+          color="secondary"
           class="justify-center"
           @click="goAudit"
         >
