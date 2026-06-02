@@ -28,21 +28,21 @@ export default defineAppConfig({
     input: {
       variants: {
         variant: {
-          outline: 'text-highlighted bg-default ring ring-inset ring-brandgrey-50'
+          outline: 'text-black bg-white ring ring-inset ring-brandgrey-50'
         }
       }
     },
     textarea: {
       variants: {
         variant: {
-          outline: 'text-highlighted bg-default ring ring-inset ring-brandgrey-50'
+          outline: 'text-black bg-white ring ring-inset ring-brandgrey-50'
         }
       }
     },
     select: {
       variants: {
         variant: {
-          outline: 'text-highlighted bg-default ring ring-inset ring-brandgrey-50 hover:bg-brandgrey-50'
+          outline: 'text-black bg-white ring ring-inset ring-brandgrey-50 hover:bg-brandgrey-50'
         }
       }
     },
