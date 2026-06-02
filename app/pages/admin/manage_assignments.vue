@@ -147,7 +147,7 @@ const formatDate = (dateString: string) => {
         class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-2xl border border-gray-200 p-4 md:items-center"
       >
         <!-- Left side: Assignment Info -->
-        <div class="text-sm">
+        <div class="text-sm min-w-0">
           <div>
             <span class="font-medium">{{ item.licenseKey.product.productName }} - {{ item.licenseKey.licenseName }}</span>
             <span class="text-gray-600"> angefragt von </span>
@@ -155,7 +155,7 @@ const formatDate = (dateString: string) => {
           </div>
           <div
             v-if="item.assignmentNote"
-            class="text-sm text-gray-500 mt-1 italic"
+            class="text-sm text-gray-500 mt-1 italic break-words whitespace-normal"
           >
             "{{ item.assignmentNote }}"
           </div>

@@ -149,10 +149,10 @@ const getStatusColor = (status: string) => {
       <div
         v-for="item in filteredHistory"
         :key="item.id"
-        class="grid grid-cols-2 gap-x-4 gap-y-1 rounded-2xl border border-gray-200 p-4 items-center"
+        class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-x-4 gap-y-2 rounded-2xl border border-gray-200 p-4 items-start"
       >
         <!-- Left side: Product and Status -->
-        <div class="text-sm">
+        <div class="text-sm min-w-0">
           <div>
             <span class="font-medium">{{ item.licenseAssignment.licenseKey.product.productName }} - {{ item.licenseAssignment.licenseKey.licenseName }}</span>
             <span class="text-gray-600"> für </span>
@@ -179,7 +179,7 @@ const getStatusColor = (status: string) => {
         </div>
 
         <!-- Right side: Audit Info -->
-        <div class="text-xs text-gray-400 justify-self-end text-right">
+        <div class="text-xs text-gray-400 md:justify-self-end md:text-right break-words whitespace-normal">
           Geändert von
           <span class="font-semibold">{{ item.changedBy.email }}</span>
           <div>am {{ formatDate(item.changedAt) }}</div>
