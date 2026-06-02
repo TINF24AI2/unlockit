@@ -101,56 +101,58 @@ const formatDate = (dateString: string) => {
     </h1>
 
     <!-- Options menu -->
-    <div class="grid grid-cols-[1fr_3fr] gap-20 items-start">
-      <Container class="grid gap-4 w-full h-fit p-6">
-        <UButton
-          color="secondary"
-          class="justify-center"
-          @click="goManageProducts"
-        >
-          Verwaltung von Produkte/Lizenzen
-        </UButton>
+    <div class="flex flex-col gap-6 xl:grid xl:grid-cols-[1fr_3fr] xl:gap-20 xl:items-start">
+      <div class="flex justify-center xl:block">
+        <Container class="grid gap-4 w-full max-w-md h-fit p-6">
+          <UButton
+            color="secondary"
+            class="justify-center"
+            @click="goManageProducts"
+          >
+            Verwaltung von Produkte/Lizenzen
+          </UButton>
 
-        <UButton
-          color="secondary"
-          class="justify-center"
-          @click="goManageAssignments"
-        >
-          Lizenzgenehmigung
-        </UButton>
+          <UButton
+            color="secondary"
+            class="justify-center"
+            @click="goManageAssignments"
+          >
+            Lizenzgenehmigung
+          </UButton>
 
-        <UButton
-          color="secondary"
-          class="justify-center"
-          @click="goApply"
-        >
-          Produkte/Lizenzen beantragen
-        </UButton>
+          <UButton
+            color="secondary"
+            class="justify-center"
+            @click="goApply"
+          >
+            Produkte/Lizenzen beantragen
+          </UButton>
 
-        <UButton
-          color="secondary"
-          class="justify-center"
-          @click="goManageUsers"
-        >
-          Verwaltung User
-        </UButton>
+          <UButton
+            color="secondary"
+            class="justify-center"
+            @click="goManageUsers"
+          >
+            Verwaltung User
+          </UButton>
 
-        <UButton
-          color="secondary"
-          class="justify-center"
-          @click="goAudit"
-        >
-          Historie aller Lizenz-Anfragen
-        </UButton>
+          <UButton
+            color="secondary"
+            class="justify-center"
+            @click="goAudit"
+          >
+            Historie aller Lizenz-Anfragen
+          </UButton>
 
-        <UButton
-          color="secondary"
-          class="justify-center"
-          @click="goHistory"
-        >
-          Persönliche Historie
-        </UButton>
-      </Container>
+          <UButton
+            color="secondary"
+            class="justify-center"
+            @click="goHistory"
+          >
+            Persönliche Historie
+          </UButton>
+        </Container>
+      </div>
 
       <!-- Preview panel -->
       <Container class="p-6">
@@ -177,26 +179,44 @@ const formatDate = (dateString: string) => {
           <div
             v-for="item in previewAssignments"
             :key="item.id"
-            class="grid grid-cols-1 gap-4 rounded-2xl border border-gray-200 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start"
+            class="flex flex-col gap-4 rounded-2xl border border-gray-200 p-4 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start"
           >
-            <div class="min-w-0 text-sm break-words">
-              <div class="flex flex-wrap gap-x-2 gap-y-1">
-                <span class="font-medium break-words">{{ item.licenseKey.product.productName }} - {{ item.licenseKey.licenseName }}</span>
-                <span class="text-gray-600">angefragt von</span>
-                <span class="font-medium break-words">{{ item.user.email }}</span>
+            <div class="min-w-0 text-sm">
+              <div class="grid gap-0.5 min-w-0">
+                <span class="font-medium whitespace-normal [overflow-wrap:anywhere]">
+                  {{ item.licenseKey.product.productName }} - {{ item.licenseKey.licenseName }}
+                </span>
+                <span class="text-gray-600">
+                  angefragt von
+                </span>
+                <span class="font-medium whitespace-normal [overflow-wrap:anywhere]">
+                  {{ item.user.email }}
+                </span>
               </div>
               <div
                 v-if="item.assignmentNote"
-                class="mt-1 text-sm italic text-gray-500 break-words whitespace-normal md:max-w-[52ch]"
+                class="mt-1 text-sm italic text-gray-500 whitespace-normal [overflow-wrap:anywhere]"
               >
-                {{ item.assignmentNote }}
+                <span v-if="item.assignmentNote.length > 140">
+                  Begründung zu lang, bitte in
+                  <NuxtLink
+                    to="/admin/manage_assignments"
+                    class="underline underline-offset-2"
+                  >
+                    Lizenzanfragen
+                  </NuxtLink>
+                  schauen.
+                </span>
+                <span v-else>
+                  {{ item.assignmentNote }}
+                </span>
               </div>
               <div class="mt-2 text-xs text-gray-400">
                 Angefragt am {{ formatDate(item.requestedAt) }}
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 justify-items-center md:w-56 md:shrink-0">
+            <div class="flex flex-col gap-2 lg:w-56 lg:shrink-0">
               <div class="flex w-full justify-center">
                 <UPopover
                   :key="`popover-accept-${item.id}`"

@@ -349,32 +349,36 @@ const canReactivateLicense = (item: DisplayLicense) => {
         :key="item.id"
         class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-2xl border border-gray-200 p-4 md:items-center"
       >
-        <div class="text-sm space-y-1">
-          <div class="flex items-center gap-2">
-            <span class="font-medium">{{ item.product.productName }} - {{ item.licenseName }}</span>
-            <UBadge
-              :color="getStatusColor(item.status)"
-              variant="subtle"
-              size="md"
-              class="ml-2"
-            >
-              {{ statusLabels[item.status] }}
-            </UBadge>
-            <UBadge
-              v-if="item.productStatus && item.productStatus !== 'DELETED'"
-              :color="getProductStatusColor(item.productStatus)"
-              variant="subtle"
-              size="md"
-              class="ml-2"
-            >
-              {{ productStatusLabels[item.productStatus] }}
-            </UBadge>
+        <div class="min-w-0 text-sm space-y-1">
+          <div class="grid gap-1 min-w-0">
+            <span class="font-medium whitespace-normal [overflow-wrap:anywhere]">
+              {{ item.product.productName }} - {{ item.licenseName }}
+            </span>
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                :color="getStatusColor(item.status)"
+                variant="subtle"
+                size="md"
+                class="w-fit"
+              >
+                {{ statusLabels[item.status] }}
+              </UBadge>
+              <UBadge
+                v-if="item.productStatus && item.productStatus !== 'DELETED'"
+                :color="getProductStatusColor(item.productStatus)"
+                variant="subtle"
+                size="md"
+                class="w-fit"
+              >
+                {{ productStatusLabels[item.productStatus] }}
+              </UBadge>
+            </div>
           </div>
           <div>
             <span class="text-gray-500">Schlüssel: </span>
-            <span class="font-semibold text-gray-700">{{ item.licenseKey }}</span>
+            <span class="font-semibold text-gray-700 whitespace-normal [overflow-wrap:anywhere]">{{ item.licenseKey }}</span>
           </div>
-          <div class="text-gray-500">
+          <div class="text-gray-500 whitespace-normal [overflow-wrap:anywhere]">
             Typ: {{ item.licenseType }} | Nutzung: {{ item.currentUsages }} / {{ item.maxUsages }}
           </div>
         </div>
