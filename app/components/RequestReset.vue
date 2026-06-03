@@ -28,7 +28,7 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
 
 <template>
   <div class="flex justify-center px-4 pt-6 pb-8">
-    <UPageCard class="w-full max-w-md bg-gray-400">
+    <UPageCard class="w-full max-w-md bg-white text-black border-0 shadow-none ring-0">
       <UAuthForm
         :schema="schema"
         title="Passwort zurücksetzen"
@@ -37,7 +37,7 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
           label: 'Link senden',
           color: 'neutral'
         }"
-        class="max-w-md"
+        class="max-w-md text-black border-0 shadow-none ring-0"
         @submit="onSubmit"
       />
     </UPageCard>

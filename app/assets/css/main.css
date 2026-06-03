@@ -4,23 +4,67 @@
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
 
-  --color-brand: #83AF99;
-  --color-brandgray: #CECBCB;
-  --color-brandred: #C46F71;
+  --color-brand-50: #FFFFFF;
+  --color-brand-100: #FFFFFF;
+  --color-brand-200: #FFFFFF;
+  --color-brand-300: #FFFFFF;
+  --color-brand-400: #EAF0EE;
+  --color-brand-500: #D2DFDB;
+  --color-brand-600: #B1C8C1;
+  --color-brand-700: #90B0A7;
+  --color-brand-800: #70998C;
+  --color-brand-900: #577A6F;
+  --color-brand-950: #4B6A60;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  --color-brandgreen-50: #E3F0E7;
+  --color-brandgreen-100: #D6E9DB;
+  --color-brandgreen-200: #BBDAC4;
+  --color-brandgreen-300: #A1CCAE;
+  --color-brandgreen-400: #86BD97;
+  --color-brandgreen-500: #6CAF80;
+  --color-brandgreen-600: #509364;
+  --color-brandgreen-700: #3C6F4B;
+  --color-brandgreen-800: #284A33;
+  --color-brandgreen-900: #15261A;
+  --color-brandgreen-950: #0B140D;
+
+  --color-brandred-50: #FFFFFF;
+  --color-brandred-100: #FDF6F6;
+  --color-brandred-200: #F7D3D3;
+  --color-brandred-300: #F1B0B0;
+  --color-brandred-400: #EB8E8E;
+  --color-brandred-500: #E56B6B;
+  --color-brandred-600: #DD3B3B;
+  --color-brandred-700: #BE2121;
+  --color-brandred-800: #8F1919;
+  --color-brandred-900: #5F1111;
+  --color-brandred-950: #470C0C;
+
+  --color-brandyellow-50: #FEFCF9;
+  --color-brandyellow-100: #FBF4E8;
+  --color-brandyellow-200: #F6E4C4;
+  --color-brandyellow-300: #F1D3A1;
+  --color-brandyellow-400: #EBC37D;
+  --color-brandyellow-500: #E6B25A;
+  --color-brandyellow-600: #DF9B29;
+  --color-brandyellow-700: #DF9B29;
+  --color-brandyellow-800: #845A14;
+  --color-brandyellow-900: #53390D;
+  --color-brandyellow-950: #3B2809;
+
+  --color-brandgrey-50: #DADEE7;
+  --color-brandgrey-100: #C2C5CC;
+  --color-brandgrey-200: #ACB0BA;
+  --color-brandgrey-300: #969BA7;
+  --color-brandgrey-400: #7F8694;
+  --color-brandgrey-500: #6B7280;
+  --color-brandgrey-600: #515761;
+  --color-brandgrey-700: #383C43;
+  --color-brandgrey-800: #1E2024;
+  --color-brandgrey-900: #050506;
+  --color-brandgrey-950: #000000;
 }
 
 body {
-  @apply bg-white text-gray-900;
+  background-color: var(--color-brand-500);
 }

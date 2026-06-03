@@ -3,12 +3,15 @@ definePageMeta({
   middleware: ['authenticated']
 })
 
-const { clear: clearSession } = useUserSession()
+const { user, fetch: refreshSession } = useUserSession()
 
-async function logout() {
-  await clearSession()
-  await navigateTo('/login')
-}
+await refreshSession()
+
+const isAdmin = computed(() =>
+  (user.value as LoggedInUser | null)?.permissions?.includes('ADMIN') ?? false
+)
+
+await navigateTo(isAdmin.value ? '/admin/homepage' : '/user/homepage', { replace: true })
 </script>
 
 <template>
@@ -85,8 +88,5 @@ async function logout() {
         }]"
       />
     </UPageSection>
-    <button @click="logout">
-      Logout
-    </button>
   </div>
 </template>
