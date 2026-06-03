@@ -23,15 +23,13 @@ function parseEndDate(dateString?: string): Date | undefined {
 }
 
 // Build a filename based on the provided date range and format
-function buildFilename(ext: string, startDate?: Date, endDate?: Date): string {
-  const fmt = (d: Date) => d.toISOString().slice(0, 10)
-
-  if (startDate && endDate) {
-    return `audit-export_${fmt(startDate)}_to_${fmt(endDate)}.${ext}`
-  } else if (startDate) {
-    return `audit-export_from_${fmt(startDate)}.${ext}`
-  } else if (endDate) {
-    return `audit-export_until_${fmt(endDate)}.${ext}`
+function buildFilename(ext: string, startDateStr?: string, endDateStr?: string): string {
+  if (startDateStr && endDateStr) {
+    return `audit-export_${startDateStr}_to_${endDateStr}.${ext}`
+  } else if (startDateStr) {
+    return `audit-export_from_${startDateStr}.${ext}`
+  } else if (endDateStr) {
+    return `audit-export_until_${endDateStr}.${ext}`
   } else {
     return `audit-export_all.${ext}`
   }
@@ -45,6 +43,9 @@ export default defineEventHandler(async (event) => {
     const format = (query.format as string)?.toLowerCase() || 'csv'
     const startDate = parseStartDate(query.startDate as string)
     const endDate = parseEndDate(query.endDate as string)
+    // Extract original date strings for display (YYYY-MM-DD format)
+    const startDateStr = query.startDate ? (query.startDate as string).split('T')[0] : undefined
+    const endDateStr = query.endDate ? (query.endDate as string).split('T')[0] : undefined
 
     if (!['csv', 'pdf'].includes(format)) {
       throw createError({
@@ -73,20 +74,20 @@ export default defineEventHandler(async (event) => {
       setResponseHeader(
         event,
         'Content-Disposition',
-        `attachment; filename="${buildFilename('csv', startDate, endDate)}"`
+        `attachment; filename="${buildFilename('csv', startDateStr, endDateStr)}"`
       )
 
       return csvContent
     } else if (format === 'pdf') {
       // Generate PDF
-      const pdfBuffer = await generatePDF(auditRecords, startDate, endDate)
+      const pdfBuffer = await generatePDF(auditRecords, startDate, endDate, startDateStr, endDateStr)
 
       // Set response headers for PDF download
       setResponseHeader(event, 'Content-Type', 'application/pdf')
       setResponseHeader(
         event,
         'Content-Disposition',
-        `attachment; filename="${buildFilename('pdf', startDate, endDate)}"`
+        `attachment; filename="${buildFilename('pdf', startDateStr, endDateStr)}"`
       )
 
       return new Uint8Array(pdfBuffer)
