@@ -108,6 +108,67 @@ const getStatusColor = (status: string) => {
     default: return 'neutral'
   }
 }
+
+// export related
+const exportAll = ref(true)
+
+const exportModalOpen = ref(false)
+
+const exportFormat = ref<'csv' | 'pdf'>('csv')
+
+const exportStartDate = ref('')
+const exportEndDate = ref('')
+
+const exportLoad = ref(false)
+
+const exportAudit = async () => {
+  exportLoad.value = true
+
+  try {
+    const params = new URLSearchParams({
+      format: exportFormat.value
+    })
+
+    if (!exportAll.value) {
+      if (exportStartDate.value) {
+        params.append('startDate', exportStartDate.value)
+      }
+
+      if (exportEndDate.value) {
+        params.append('endDate', exportEndDate.value)
+      }
+    }
+
+    const response = await fetch(
+      `/api/audit/export?${params.toString()}`,
+      {
+        credentials: 'include'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Export fehlgeschlagen')
+    }
+
+    const file = await response.blob()
+
+    const url = window.URL.createObjectURL(file)
+
+    const link = document.createElement('a')
+    link.href = url
+
+    const extension = exportFormat.value
+    link.download = `audit-export-${extension}`
+
+    link.click()
+
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error(error)
+  } finally {
+    exportLoad.value = false
+  }
+}
 </script>
 
 <template>
@@ -135,6 +196,15 @@ const getStatusColor = (status: string) => {
           class="justify-self-end w-1/3 rounded-md pl-3 pr-3 py-1"
         />
       </div>
+      <UButton
+        v-if="isAdmin"
+        icon="i-lucide-arrow-down-to-line"
+        color="primary"
+        class="absolute bottom-6 right-6"
+        @click="exportModalOpen = true"
+      >
+        Export
+      </UButton>
     </div>
 
     <div
@@ -186,5 +256,80 @@ const getStatusColor = (status: string) => {
         </div>
       </div>
     </div>
+
+    <UModal
+      v-model:open="exportModalOpen"
+      :ui="{ content: 'max-w-sm w-full' }"
+    >
+      <template #content>
+        <div class="p-6 space-y-4">
+          <h3 class="mb-4 text-xl font-semibold text-white">
+            Audit Export
+          </h3>
+
+          <USelect
+            v-model="exportFormat"
+            :items="[
+              { label: 'CSV', value: 'csv' },
+              { label: 'PDF', value: 'pdf' }
+            ]"
+            value-attribute="value"
+            option-attribute="label"
+            class="w-full"
+          />
+
+          <div class="space-y-4 w-full">
+            <UCheckbox
+              v-model="exportAll"
+              label="Gesamten Zeitraum exportieren"
+            />
+            <div
+              v-if="!exportAll"
+            >
+              <div>
+                <label class="text-sm block mb-1 text-white">
+                  Von
+                </label>
+
+                <UInput
+                  v-model="exportStartDate"
+                  type="date"
+                  class="w-full"
+                />
+              </div>
+
+              <div>
+                <label class="text-sm block mb-1 text-white">
+                  Bis
+                </label>
+
+                <UInput
+                  v-model="exportEndDate"
+                  type="date"
+                  class="w-full"
+                />
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-2">
+              <UButton
+                color="neutral"
+                variant="subtle"
+                @click="exportModalOpen = false"
+              >
+                Abbrechen
+              </UButton>
+
+              <UButton
+                :loading="exportLoad"
+                @click="exportAudit"
+              >
+                Exportieren
+              </UButton>
+            </div>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </Container>
 </template>
