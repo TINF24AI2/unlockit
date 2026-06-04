@@ -263,8 +263,8 @@ const exportAudit = async () => {
     >
       <template #content>
         <div class="p-6 space-y-4">
-          <h3 class="mb-4 text-xl font-semibold text-white">
-            Audit Export
+          <h3 class="mb-4 text-xl font-semibold">
+            Audit-Export
           </h3>
 
           <USelect
@@ -287,7 +287,7 @@ const exportAudit = async () => {
               v-if="!exportAll"
             >
               <div>
-                <label class="text-sm block mb-1 text-white">
+                <label class="text-sm block mb-1">
                   Von
                 </label>
 
@@ -299,7 +299,7 @@ const exportAudit = async () => {
               </div>
 
               <div>
-                <label class="text-sm block mb-1 text-white">
+                <label class="text-sm block mb-1">
                   Bis
                 </label>
 
