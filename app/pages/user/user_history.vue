@@ -33,7 +33,7 @@ const filteredHistory = computed(() => {
     const licenseName = (assignment.licenseKey.licenseName || '').toLowerCase()
     const licenseType = (assignment.licenseKey.licenseType || '').toLowerCase()
     const productName = (assignment.licenseKey.product.productName || '').toLowerCase()
-    const vendor = (assignment.licenseKey.product.vendor || '').toLowerCase()
+    const licenseKey = (assignment.licenseKey.licenseKey || '').toLowerCase()
     const assignmentNote = (assignment.assignmentNote || '').toLowerCase()
 
     return (
@@ -44,7 +44,7 @@ const filteredHistory = computed(() => {
       || licenseName.includes(query)
       || licenseType.includes(query)
       || productName.includes(query)
-      || vendor.includes(query)
+      || licenseKey.includes(query)
       || assignmentNote.includes(query)
     )
   })
@@ -58,7 +58,7 @@ const { data, pending } = await useFetch<{
 
 <template>
   <Container>
-    <div class="relative mb-6">
+    <div class="relative mb-4 text-xl font-semibold">
       <h2 class="text-center mb-6 text-2xl">
         Nutzerhistorie
       </h2>

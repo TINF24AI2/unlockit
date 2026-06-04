@@ -12,6 +12,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { appUrl } = useRuntimeConfig()
   await authorize(event, isAdmin)
 
   const session = await requireUserSession(event)
@@ -74,13 +75,13 @@ export default defineEventHandler(async (event) => {
       html: `
         <p>Hallo${name ? ` ${name}` : ''},</p>
         <p>Sie wurden eingeladen, sich bei Unlockit anzumelden. Bitte klicken Sie auf den unten stehenden Link, um Ihr Passwort festzulegen und Ihren Account zu aktivieren:</p>
-        <a href="${getRequestURL(event).origin}/set-password?token=${token}">Passwort festlegen</a>
+        <a href="${appUrl}/set-password?token=${token}">Passwort festlegen</a>
         <p>Dieser Link läuft in 24 Stunden ab. Danach können Sie die Funktion zum Zurücksetzen des Passworts mit dieser E-Mail-Adresse verwenden, um einen neuen Link zu generieren.</p>
         <p>Wenn Sie diese Einladung nicht erwartet haben, ignorieren Sie bitte diese E-Mail.</p>
         <br>
         <p>Viele Grüße,<br>Ihr SE-SSP Team</p>
       `,
-      text: `Hallo${name ? ` ${name}` : ''},\n\nSie wurden eingeladen, sich bei Unlockit anzumelden. Bitte verwenden Sie den unten stehenden Link, um Ihr Passwort festzulegen und Ihren Account zu aktivieren:\n\n${getRequestURL(event).origin}/set-password?token=${token}\n\nDieser Link läuft in 24 Stunden ab. Danach können Sie die Funktion zum Zurücksetzen des Passworts mit dieser E-Mail-Adresse verwenden, um einen neuen Link zu generieren.\n\nWenn Sie diese Einladung nicht erwartet haben, ignorieren Sie bitte diese E-Mail.\n\nViele Grüße,\nIhr SE-SSP Team`
+      text: `Hallo${name ? ` ${name}` : ''},\n\nSie wurden eingeladen, sich bei Unlockit anzumelden. Bitte verwenden Sie den unten stehenden Link, um Ihr Passwort festzulegen und Ihren Account zu aktivieren:\n\n${appUrl}/set-password?token=${token}\n\nDieser Link läuft in 24 Stunden ab. Danach können Sie die Funktion zum Zurücksetzen des Passworts mit dieser E-Mail-Adresse verwenden, um einen neuen Link zu generieren.\n\nWenn Sie diese Einladung nicht erwartet haben, ignorieren Sie bitte diese E-Mail.\n\nViele Grüße,\nIhr SE-SSP Team`
     })
   } catch (error) {
     console.error(error)

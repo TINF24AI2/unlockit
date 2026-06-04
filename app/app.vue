@@ -7,12 +7,13 @@ useHead({
     { rel: 'icon', href: '/favicon.ico' }
   ],
   htmlAttrs: {
-    lang: 'en'
+    lang: 'en',
+    class: 'light'
   }
 })
 
-const title = 'Nuxt Starter Template'
-const description = 'A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours.'
+const title = 'UnlockIT'
+const description = 'An app for managing license requests and licenses'
 
 useSeoMeta({
   title,
@@ -25,7 +26,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp>
+  <UApp id="top">
     <NavigationHeader />
 
     <UMain>
@@ -37,16 +38,15 @@ useSeoMeta({
     <UFooter>
       <template #left>
         <p class="text-sm text-muted">
-          Built with Nuxt UI and love • © {{ new Date().getFullYear() }}
+          Built for SWE - Group Project © {{ new Date().getFullYear() }}
         </p>
       </template>
 
       <template #right>
         <UButton
-          to="https://github.com/nuxt-ui-templates/starter"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
+          to="#top"
+          label="Zurück nach oben"
+          icon="i-heroicons-arrow-up-20-solid"
           color="neutral"
           variant="ghost"
         />

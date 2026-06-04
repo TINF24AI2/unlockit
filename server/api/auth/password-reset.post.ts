@@ -9,6 +9,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { appUrl } = useRuntimeConfig()
   const { email } = await readValidatedBody(event, bodySchema.parse)
 
   if (email === 'system') {
@@ -47,13 +48,13 @@ export default defineEventHandler(async (event) => {
       html: `
         <p>Hallo${user.name ? ` ${user.name}` : ''},</p>
         <p>Sie haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Bitte klicken Sie auf den unten stehenden Link, um ein neues Passwort festzulegen:</p>
-        <a href="${getRequestURL(event).origin}/set-password?token=${token}">Passwort zurücksetzen</a>
+        <a href="${appUrl}/set-password?token=${token}">Passwort zurücksetzen</a>
         <p>Dieser Link läuft in 24 Stunden ab. Wenn Sie kein neues Passwort festlegen, können Sie diese E-Mail ignorieren.</p>
         <p>Wenn Sie diese Anfrage nicht gestellt haben, kontaktieren Sie bitte umgehend unseren Support.</p>
         <br>
         <p>Viele Grüße,<br>Ihr SE-SSP Team</p>
       `,
-      text: `Hallo${user.name ? ` ${user.name}` : ''},\n\nSie haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Bitte verwenden Sie den unten stehenden Link, um ein neues Passwort festzulegen:\n\n${getRequestURL(event).origin}/set-password?token=${token}\n\nDieser Link läuft in 24 Stunden ab. Wenn Sie kein neues Passwort festlegen, können Sie diese E-Mail ignorieren.\n\nWenn Sie diese Anfrage nicht gestellt haben, kontaktieren Sie bitte umgehend unseren Support.\n\nViele Grüße,\nIhr SE-SSP Team`
+      text: `Hallo${user.name ? ` ${user.name}` : ''},\n\nSie haben eine Anfrage zum Zurücksetzen Ihres Passworts erhalten. Bitte verwenden Sie den unten stehenden Link, um ein neues Passwort festzulegen:\n\n${appUrl}/set-password?token=${token}\n\nDieser Link läuft in 24 Stunden ab. Wenn Sie kein neues Passwort festlegen, können Sie diese E-Mail ignorieren.\n\nWenn Sie diese Anfrage nicht gestellt haben, kontaktieren Sie bitte umgehend unseren Support.\n\nViele Grüße,\nIhr SE-SSP Team`
     })
   } catch (error) {
     console.error('Error sending email:', error)

@@ -158,9 +158,8 @@ const goCreateUser = () => {
       </div>
     </div>
 
-    <!-- Scrollbar -->
     <div
-      class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto"
+      class="bg-white rounded-3xl p-4 space-y-3"
     >
       <div
         v-for="item in filteredUsers"
@@ -204,7 +203,6 @@ const goCreateUser = () => {
           >
             <UPopover
               :key="`popover-deactivate-${item.id}`"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 color="error"
@@ -254,7 +252,6 @@ const goCreateUser = () => {
             </UButton>
             <UPopover
               :key="`popover-delete-${item.id}`"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 v-if="item.id !== user?.id"
@@ -295,7 +292,6 @@ const goCreateUser = () => {
           >
             <UPopover
               :key="`popover-delete-invited-${item.id}`"
-              :ui="{ content: 'border border-brand' }"
             >
               <UButton
                 v-if="item.id !== user?.id"

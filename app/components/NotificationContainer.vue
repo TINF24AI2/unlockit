@@ -13,8 +13,8 @@ const props = defineProps({
 
 const notificationClasses = computed(() => {
   return {
-    'bg-brand border-brand': props.type === 'success',
-    'bg-brandred border-brandred': props.type === 'failure'
+    'bg-brandgreen-500 border-brandgreen-500': props.type === 'success',
+    'bg-brandred-500 border-brandred-500': props.type === 'failure'
   }
 })
 </script>

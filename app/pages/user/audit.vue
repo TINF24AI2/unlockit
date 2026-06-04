@@ -173,9 +173,9 @@ const exportAudit = async () => {
 
 <template>
   <Container class="p-6 relative pb-20">
-    <div class="text-center">
+    <div class="grid mb-6 gap-2">
       <h2
-        class="mb-4 text-xl font-semibold"
+        class="mb-4 text-xl font-semibold text-center"
       >
         Historie der Lizenzanfragen
       </h2>
@@ -208,7 +208,7 @@ const exportAudit = async () => {
     </div>
 
     <div
-      class="bg-white rounded-3xl p-4 space-y-3 max-h-96 overflow-y-auto"
+      class="bg-white rounded-3xl p-4 space-y-3"
     >
       <div
         v-if="filteredHistory.length === 0"
@@ -219,10 +219,10 @@ const exportAudit = async () => {
       <div
         v-for="item in filteredHistory"
         :key="item.id"
-        class="grid grid-cols-2 gap-x-4 gap-y-1 rounded-2xl border border-gray-200 p-4 items-center"
+        class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-x-4 gap-y-2 rounded-2xl border border-gray-200 p-4 items-start"
       >
         <!-- Left side: Product and Status -->
-        <div class="text-sm">
+        <div class="text-sm min-w-0">
           <div>
             <span class="font-medium">{{ item.licenseAssignment.licenseKey.product.productName }} - {{ item.licenseAssignment.licenseKey.licenseName }}</span>
             <span class="text-gray-600"> für </span>
@@ -249,7 +249,7 @@ const exportAudit = async () => {
         </div>
 
         <!-- Right side: Audit Info -->
-        <div class="text-xs text-gray-400 justify-self-end text-right">
+        <div class="text-xs text-gray-400 md:justify-self-end md:text-right break-words whitespace-normal">
           Geändert von
           <span class="font-semibold">{{ item.changedBy.email }}</span>
           <div>am {{ formatDate(item.changedAt) }}</div>
