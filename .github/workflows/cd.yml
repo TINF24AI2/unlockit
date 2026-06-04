@@ -51,6 +51,9 @@ jobs:
       - name: Upload build
         run: scp -r ./.output/* target:/var/www/unlockit/deployments/${{ env.DEPLOY_NAME }}/.output/
 
+      - name: Install pdf dependencies
+        run: ssh target "cd /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }} && npm i pdfmake roboto-font"
+
       - name: Update symlink
         run: ssh target ln -sfn /var/www/unlockit/deployments/${{ env.DEPLOY_NAME }} /var/www/unlockit/live/current
 
