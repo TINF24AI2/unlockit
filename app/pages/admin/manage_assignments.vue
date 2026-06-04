@@ -144,28 +144,34 @@ const formatDate = (dateString: string) => {
       <div
         v-for="item in filteredAssignments"
         :key="item.id"
-        class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 rounded-2xl border border-gray-200 p-4 md:items-center"
+        class="flex flex-col gap-4 rounded-2xl border border-gray-200 p-4 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-start"
       >
         <!-- Left side: Assignment Info -->
-        <div class="text-sm min-w-0">
-          <div>
-            <span class="font-medium">{{ item.licenseKey.product.productName }} - {{ item.licenseKey.licenseName }}</span>
-            <span class="text-gray-600"> angefragt von </span>
-            <span class="font-medium">{{ item.user.email }}</span>
+        <div class="min-w-0 text-sm">
+          <div class="grid gap-0.5 min-w-0">
+            <span class="font-medium whitespace-normal [overflow-wrap:anywhere]">
+              {{ item.licenseKey.product.productName }} - {{ item.licenseKey.licenseName }}
+            </span>
+            <span class="text-gray-600">
+              angefragt von
+            </span>
+            <span class="font-medium whitespace-normal [overflow-wrap:anywhere]">
+              {{ item.user.email }}
+            </span>
           </div>
           <div
             v-if="item.assignmentNote"
-            class="text-sm text-gray-500 mt-1 italic break-words whitespace-normal"
+            class="mt-1 text-sm italic text-gray-500 whitespace-normal [overflow-wrap:anywhere]"
           >
             "{{ item.assignmentNote }}"
           </div>
-          <div class="text-xs text-gray-400 mt-1">
+          <div class="mt-2 text-xs text-gray-400">
             Angefragt am {{ formatDate(item.requestedAt) }}
           </div>
         </div>
 
         <!-- Right side: Action Buttons -->
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-2 md:w-56 md:shrink-0">
           <UPopover
             :key="`popover-accept-${item.id}`"
           >
