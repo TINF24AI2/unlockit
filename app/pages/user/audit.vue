@@ -128,6 +128,7 @@ const exportError = ref <{
 }>({})
 
 const exportAudit = async () => {
+  exportError.value = {}
   exportLoad.value = true
 
   if (!exportAll.value) {
