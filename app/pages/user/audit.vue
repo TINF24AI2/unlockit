@@ -177,14 +177,17 @@ const exportAudit = async () => {
     const link = document.createElement('a')
     link.href = url
 
-    const extension = exportFormat.value
-    link.download = `audit-export-${extension}`
+    link.download = `audit-export`
 
     link.click()
 
     window.URL.revokeObjectURL(url)
   } catch (error) {
     console.error(error)
+
+    exportError.value = {
+      range: 'Fehler beim Export.'
+    }
   } finally {
     exportLoad.value = false
   }
@@ -329,13 +332,13 @@ const exportAudit = async () => {
                   class="w-full"
                 />
               </div>
+            </div>
 
-              <div
-                v-if="exportError.range"
-                class="text-red-500 text-sm mt-2"
-              >
-                {{ exportError.range }}
-              </div>
+            <div
+              v-if="exportError.range"
+              class="text-red-500 text-sm mt-2"
+            >
+              {{ exportError.range }}
             </div>
 
             <div class="flex justify-center gap-2">
