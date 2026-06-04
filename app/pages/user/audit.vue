@@ -121,8 +121,28 @@ const exportEndDate = ref('')
 
 const exportLoad = ref(false)
 
+const exportError = ref <{
+  range?: string
+  startDate?: string
+  endDate?: string
+}>({})
+
 const exportAudit = async () => {
   exportLoad.value = true
+
+  if (!exportAll.value) {
+    if (!exportStartDate.value || !exportEndDate.value) {
+      exportError.value.range = 'Zeitraum muss angegeben werden!'
+      exportLoad.value = false
+      return
+    }
+  }
+
+  if (new Date(exportEndDate.value) < new Date(exportStartDate.value)) {
+    exportError.value.range = '"Bis" darf nicht vor "Vor" liegen!'
+    exportLoad.value = false
+    return
+  }
 
   try {
     const params = new URLSearchParams({
@@ -308,6 +328,13 @@ const exportAudit = async () => {
                   type="date"
                   class="w-full"
                 />
+              </div>
+
+              <div
+                v-if="exportError.range"
+                class="text-red-500 text-sm mt-2"
+              >
+                {{ exportError.range }}
               </div>
             </div>
 
