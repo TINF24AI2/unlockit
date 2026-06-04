@@ -17,6 +17,12 @@ function formatDate(date: Date): string {
   })
 }
 
+// Convert ISO date string (YYYY-MM-DD) to German date format (DD.MM.YYYY)
+function convertISOtoLocalDateString(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-')
+  return `${day}.${month}.${year}`
+}
+
 // Map internal status codes to labels in German
 function getStatusLabel(status: string): string {
   switch (status) {
@@ -69,7 +75,9 @@ export function generateCSV(records: AuditRecord[]): string {
 export async function generatePDF(
   records: AuditRecord[],
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
+  startDateStr?: string,
+  endDateStr?: string
 ): Promise<Buffer> {
   const _require = createRequire(import.meta.url)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,10 +96,11 @@ export async function generatePDF(
     }
   })
 
+  // Format date range using original input strings to avoid timezone shift issues
   let dateRangeText = ''
-  if (startDate || endDate) {
-    const start = startDate ? formatDate(startDate) : 'Anfang'
-    const end = endDate ? formatDate(endDate) : 'Heute'
+  if (startDateStr || endDateStr) {
+    const start = startDateStr ? convertISOtoLocalDateString(startDateStr) : 'Anfang'
+    const end = endDateStr ? convertISOtoLocalDateString(endDateStr) : 'Heute'
     dateRangeText = ` (${start} – ${end})`
   }
 
