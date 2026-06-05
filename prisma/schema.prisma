@@ -105,7 +105,7 @@ model LicenseAssignment {
 model AssignmentHistory {
   id                  String           @id
   licenseAssignmentId String
-  oldStatus           AssignmentStatus
+  oldStatus           AssignmentStatus?
   newStatus           AssignmentStatus
   changedAt           DateTime         @default(now())
   changedById         Int

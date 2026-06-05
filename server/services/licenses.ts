@@ -472,7 +472,7 @@ export async function requestLicense(
       history: {
         create: {
           id: randomUUID(),
-          oldStatus: AssignmentStatus.PENDING, // oldStatus can't be NULL, so initial entry is also PENDING
+          oldStatus: null,
           newStatus: AssignmentStatus.PENDING,
           changedBy: {
             connect: { id: userId }
