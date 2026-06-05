@@ -5,6 +5,8 @@ const { clear } = useUserSession()
 const route = useRoute()
 const notification = ref<{ message: string, type: 'success' | 'failure' } | null>(null)
 
+const mode = computed(() => route.query.action === 'registration' ? 'registration' : 'reset')
+
 await clear()
 
 async function submit(data: {
@@ -32,7 +34,12 @@ async function submit(data: {
       }
     })
 
-    return navigateTo('/login')
+    return navigateTo({
+      path: '/login',
+      query: {
+        passwordSet: 'success'
+      }
+    })
   } catch (error: unknown) {
     let message = 'Fehler beim Festlegen des Passworts'
 
@@ -62,6 +69,10 @@ async function submit(data: {
       @close="notification = null"
     />
 
-    <SetPassword @submit="submit" />
+    <SetPassword
+      v-if="!notification"
+      :mode="mode"
+      @submit="submit"
+    />
   </div>
 </template>
