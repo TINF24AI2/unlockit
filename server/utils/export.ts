@@ -24,12 +24,13 @@ function convertISOtoLocalDateString(isoDate: string): string {
 }
 
 // Map internal status codes to labels in German
-function getStatusLabel(status: string): string {
+function getStatusLabel(status: string | null): string {
   switch (status) {
     case 'PENDING': return 'In Bearbeitung'
     case 'APPROVED': return 'Akzeptiert'
     case 'REJECTED': return 'Abgelehnt'
     case 'REVOKED': return 'Zurückgezogen'
+    case null: return 'Neue Anfrage'
     default: return status
   }
 }

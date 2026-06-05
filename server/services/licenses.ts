@@ -468,7 +468,17 @@ export async function requestLicense(
       licenseKeyId: availableLicense.id,
       userId,
       status: AssignmentStatus.PENDING,
-      assignmentNote: reason
+      assignmentNote: reason,
+      history: {
+        create: {
+          id: randomUUID(),
+          oldStatus: null,
+          newStatus: AssignmentStatus.PENDING,
+          changedBy: {
+            connect: { id: userId }
+          }
+        }
+      }
     },
     select: {
       id: true,
