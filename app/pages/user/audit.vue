@@ -94,6 +94,7 @@ const getStatusLabel = (status: string) => {
     case 'APPROVED': return 'Akzeptiert'
     case 'REJECTED': return 'Abgelehnt'
     case 'REVOKED': return 'Zurückgezogen'
+    case null: return 'Neue Anfrage'
     default: return status
   }
 }
@@ -105,6 +106,7 @@ const getStatusColor = (status: string) => {
     case 'APPROVED': return 'primary'
     case 'REJECTED': return 'error'
     case 'REVOKED': return 'warning'
+    case null: return 'neutral'
     default: return 'neutral'
   }
 }
