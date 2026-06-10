@@ -2,6 +2,14 @@
 import * as z from 'zod'
 import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 
+const props = withDefaults(defineProps<{ // change title
+  mode?: 'reset' | 'registration'
+}>(), {
+  mode: 'reset'
+})
+
+const title = computed(() => props.mode === 'registration' ? 'Registrierung abschließen' : 'Passwort zurücksetzen')
+
 const fields = ref<AuthFormField[]>([
   {
     name: 'password',
@@ -48,7 +56,7 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md bg-white text-black border-0 shadow-none ring-0">
       <UAuthForm
         :schema="schema"
-        title="Registrierung abschließen"
+        :title="title"
         :fields="fields"
         :submit="{
           label: 'Passwort festlegen',

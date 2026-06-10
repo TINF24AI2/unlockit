@@ -9,6 +9,13 @@ const loginNotification = computed(() => {
     }
   }
 
+  if (route.query.passwordSet === 'success') {
+    return {
+      message: 'Passwort wurde erfolgreich gesetzt.',
+      type: 'success' as const
+    }
+  }
+
   return null
 })
 
