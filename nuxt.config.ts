@@ -16,7 +16,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   colorMode: {
-    preference: 'light'
+    preference: 'light',
+    storageKey: 'color-mode'
   },
 
   runtimeConfig: {
